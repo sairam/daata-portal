@@ -2,11 +2,105 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net"
+	"os"
+
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
 )
 
 func main() {
+	command := "ls -l /home/deploy"
+	host := "198.211.126.170:22"
+
 	fmt.Println("Hello World")
+
+	sshConfig := &ssh.ClientConfig{
+		User: "deploy",
+		Auth: []ssh.AuthMethod{
+			sshAgent(),
+			// publicKeyFile("/Users/ram/.ssh/id_rsa"),
+		},
+	}
+
+	connection, err := ssh.Dial("tcp", host, sshConfig)
+	if err != nil {
+		fmt.Println(fmt.Errorf("Failed to dial: %s", err))
+		return
+	}
+
+	session, err := connection.NewSession()
+	if err != nil {
+		fmt.Println(fmt.Errorf("Failed to create session: %s", err))
+		return
+	}
+
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,     // disable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	err = session.RequestPty("xterm", 80, 40, modes)
+	if err != nil {
+		session.Close()
+		fmt.Println(fmt.Errorf("request for pseudo terminal failed: %s", err))
+		return // nil,
+	}
+
+	stdin, err := session.StdinPipe()
+	if err != nil {
+		fmt.Println(fmt.Errorf("Unable to setup stdin for session: %v", err))
+		return
+	}
+	go io.Copy(stdin, os.Stdin)
+
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		fmt.Println(fmt.Errorf("Unable to setup stdout for session: %v", err))
+		return
+	}
+	go io.Copy(os.Stdout, stdout)
+
+	stderr, err := session.StderrPipe()
+	if err != nil {
+		fmt.Println(fmt.Errorf("Unable to setup stderr for session: %v", err))
+		return
+	}
+	go io.Copy(os.Stderr, stderr)
+
+	defer session.Close()
+	err = session.Run(command)
+
+	if err != nil {
+		fmt.Println(err)
+		return // err
+	}
+
 }
+
+func publicKeyFile(file string) ssh.AuthMethod {
+	buffer, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil
+	}
+
+	key, err := ssh.ParsePrivateKey(buffer)
+	if err != nil {
+		return nil
+	}
+	return ssh.PublicKeys(key)
+}
+
+func sshAgent() ssh.AuthMethod {
+	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
+		return ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers)
+	}
+	return nil
+}
+
 /*
   Phase 1
 1. SSH into a host
