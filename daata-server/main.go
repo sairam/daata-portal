@@ -14,9 +14,9 @@ import (
 
 const randomStringLength = 6
 const port = ":8001"
+const serverURL = "https://21ae9584.ap.ngrok.io"
 
-// Fileformat should be used for understand file extension
-// fdlsak
+//FileFormat is a should be used for understand file extension
 type FileFormat int
 
 const (
@@ -32,6 +32,7 @@ func main() {
 	// performAction(action, "../tmp/test12", "test12.zip")
 	// fmt.Println(randomString(randomStringLength))
 
+	http.HandleFunc("/r/", Redirect)
 	http.HandleFunc("/d/", openDir)
 	http.HandleFunc("/upload", saveFile)
 	http.HandleFunc("/", help)
@@ -62,8 +63,7 @@ func openDir(w http.ResponseWriter, r *http.Request) {
 //
 // }
 
-const serverURL = "https://c33a453f.ap.ngrok.io"
-
+// Data is of type string with a URL
 type Data struct {
 	URL string
 }
