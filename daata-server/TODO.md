@@ -1,31 +1,24 @@
-## Types of URLs
-1. Company accounts - has subdomain like google.daata.xyz/repo/url
-1. Personal accounts - at my.daata.xyz/repo/data.txt
-1. Repositories are usernames at my.daata.xyz. anyone can create a new data point. The owners are defined based on the repo.
-
-1. /temp/ is a different repo based on files which go away in few hours/days
-1. /a/ or /data is a permanent default url.
-
-## AuthS & AuthZ
-1. Auth S is based on domain and you can whitelist users by domain and add others and ensure they have Authorization per project/endpoint.
-1. Auth Z Token authorization based on -
-  1. Upload anything into your organisation
-  1. Upload to Data Point
-  1. Upload to Project?
-  1. Upload allowed to Group (useful for build systems to push anything to specific repos)
-  1. Upload means 'w'/'a', but cannot read the data
-1. Reads are same, everything, data, project/group, history.
-
-## Use Cases to Cover
-1. Upload documentation
+## Start Coding HERE in this order and `write tests`
+1. Create new entities to store information
+1. Unzip / Host files at location based on url endpoint and version
+1. Store data points in a file by time
+1. Make graph with data points
+1. Append to file based on name (per directory from multiple hosts)
+1. Create / Edit (`txt`/`md`) files (<10KB) and save back from UI
+1. UI features for `grep`, `split`, `prepend`, `append`, `clean` data etc.,
+1. Create one Organisation and User entity
+1. User Auth with `Google`/`Github` Auth Login only
+1. Authorization token by user for all entities
+1. Public website and Dashboard development in parallel
+1. Webhooks
 
 ## Workflows
 ### Upload documentation / Release Notes
-1. Create a permalink with name "Spokes Platform" (Note: A zip or gz or bzip2 file is sent, we automatically de-compress it)
+1. Create a permalink with name "Spokes Platform" (Note: A zip or gz or bz2 file is sent, we automatically de-compress it)
 1. Headers are sent as versions as array
   curl -X POST -H 'Version: "2.1.3"' -H 'Alias: ["release-20160707", "master", "stable"]' -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' --file-binary="@filename.zip" -H 'Content-Type: application/zip' https://my.daata.xyz/docs/spokes-platform
 1. Main page of https://my.daata.xyz/docs/project-name will contain all the list of recently uploaded data
-1. Triggers page to send emails on new version upload with link.
+1. Triggers webhook for actions
 
 ### Code Coverage
 1. Create a 'Data Point' project (enable History) with name "Spokes Platform" under Code Coverage (code-coverage)
@@ -74,24 +67,43 @@
 1. External widgets like images/text can be refreshed by frequency
 1. UI may need data like MIN, MAX, UNIQUE, COUNT, SUM, AVERAGE, P99, P95 etc.,
 
-## Static Website
-www.daata.xyz will contain the static website  (see if you can generate with hugo with a theme)
-/blog
-/about
-/usage/
-/use-cases/ - another blog / detail with data like how ifttt does with Receipes
-/how-its-used/ - testimonials from customers
-/pricing
+## Main Website
+* www.daata.xyz will contain the static website  (see if you can generate with hugo with a theme?)
+* /blog/...
+* /about
+* /usage
+* /use-cases/ - another blog / detail with data like how ifttt does with recipes
+* /how-it-is-being-used/ - testimonials from customers
+* /innovative-dashboard/
+* /pricing
+* /{feature}
+(think about SEO keywords to use here)
 
+## Types of URLs
+1. Company accounts - has subdomain like google.daata.xyz/repo/url
+1. Personal accounts - at my.daata.xyz/repo/data.txt
+1. Repositories are usernames at my.daata.xyz. anyone can create a new data point. The owners are defined based on the repo.
 
-Everyone will login through subdomain.daata.xyz/auth or my.daata.xyz/auth. If a domain is authenticated
+1. /temp/ is a different repo based on files which go away in few hours/days
+1. /a/ or /data is a permanent default url.
+1. /r/ for redirects
 
-Every user in every organisation has an account. Data can never move across organisations.
+## AuthS & AuthZ
+1. Auth S is based on domain and you can whitelist users by domain and add others and ensure they have Authorization per project/endpoint.
+1. Auth Z Token authorization based on -
+  1. Upload anything into your organisation
+  1. Upload to Data Point
+  1. Upload to Project?
+  1. Upload allowed to Group (useful for build systems to push anything to specific repos)
+  1. Upload means 'w'/'a', but cannot read the data
+1. Reads are same, everything, data, project/group, history.
 
-An employee is part of multiple teams/projects and a Company has many teams
-This is required for authorization by project/team for sensitive information
-
-Freeze / Snapshot capability
-Revision history for overriding values (as a pro feature)
-
-For hosting repos, look at gogs UI
+## By User
+* Everyone will login through subdomain.daata.xyz/auth or my.daata.xyz/auth. If a domain is authenticated
+* Every user in every organisation has an account. Data can never move across organisations.
+* An employee is part of multiple teams/projects and a Company has many teams
+* This is required for authorization by project/team for sensitive information
+* Freeze / Snapshot capability
+* Revision history for overriding values (as a pro feature)
+* For hosting repos/data, look at gogs UI(MIT)
+* Hooks/Webhooks can be created to trigger website updates
