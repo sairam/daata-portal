@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,6 +25,11 @@ type urlShortnerForm struct {
 // returns true if the file exists
 // returns false if the file does not exist
 func exists(shortURL string) bool {
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+	fmt.Println(shortURL)
+
 	file, err := os.Open(shortURL)
 	if err != nil {
 		return false
@@ -60,6 +66,7 @@ func moveToDir() func() string {
 		return pwd
 	}
 }
+
 func insert(shortURL, longURL string) error {
 	dir := moveToDir()
 	os.Chdir(dir())
@@ -99,20 +106,28 @@ func update(shortURL, longURL string) error {
 
 // insert query, don't update
 func insertshortURL(shortURL, longURL string) error {
-	makeEntryEvenIfExists(shortURL, longURL, false)
-	return nil
+	return makeEntryEvenIfExists(shortURL, longURL, false)
 }
 
 // upsert query
 func upsertshortURL(shortURL, longURL string) error {
-	makeEntryEvenIfExists(shortURL, longURL, true)
-	return nil
+	return makeEntryEvenIfExists(shortURL, longURL, true)
+}
+
+func noOp(_, _ string) error {
+	return errors.New("could not process")
 }
 
 func makeEntryEvenIfExists(shortURL, longURL string, override bool) error {
-	function := insert
+	function := noOp
+	fmt.Println(override)
 	if exists(shortURL) {
-		function = update
+		if override {
+			fmt.Println(override)
+			function = update
+		}
+	} else {
+		function = insert
 	}
 	return function(shortURL, longURL)
 }
@@ -122,14 +137,13 @@ func CreateOrUpdateURL(shortURL, longURL string, update bool) (string, error) {
 	if shortURL == "" {
 		shortURL = randomString(6)
 	}
+	var err error
 	if update {
-		upsertshortURL(shortURL, longURL)
-		// upsert query
+		err = upsertshortURL(shortURL, longURL)
 	} else {
-		insertshortURL(shortURL, longURL)
+		err = insertshortURL(shortURL, longURL)
 	}
-	// update
-	return "", nil
+	return shortURL, err
 }
 
 // add caching if required in service layer
@@ -161,7 +175,7 @@ func validate(shortURL, longURL string) error {
 		return err
 	}
 
-	valid, err = validateLongURL(longURL)
+	valid, err := validateLongURL(longURL)
 	if err != nil {
 		return err
 	}
@@ -183,14 +197,14 @@ func validateShortURL(_ string) error {
 
 func validateBlankURL(str string) error {
 	if str == "" {
-		return errors.new("long_url is blank")
+		return errors.New("long_url is blank")
 	}
 	return nil
 }
 
 func validateRelativePath(str string) error {
 	if str[0] != '/' {
-		return errors.new("url does not start with '/'")
+		return errors.New("url does not start with '/'")
 	}
 	// ensure does not have script tag
 	return nil
@@ -236,6 +250,10 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		// err := r.ParseForm()
 		err := r.ParseMultipartForm(5000)
 		if err != nil {
+			// TODO - generate form based on Content-Type
+			// application/x-www-form-urlencoded
+			// multipart/form-data
+			// application/json
 			// request Content-Type isn't multipart/form-data if r.ParseForm()
 			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		}
