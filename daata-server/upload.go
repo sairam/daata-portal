@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -17,19 +18,33 @@ import (
   4. Static files edited in UI (via markdown etc., to be updated in place)
 */
 
-//
-// func showFile(w http.ResponseWriter, r *http.Request) {
-// 	fileName := r.URL.String()
-// 	data := strings.TrimLeft(fileName, "/d/")
-// 	openIndex(fileName)
-// 	fmt.Fprintf(w, "%s\n", data)
-// }
-//
-// func openIndex(file string) {
-//
-// }
+func unableToDetermine(_ http.ResponseWriter, _ *http.Request) error {
+	return errors.New("Unable to determine the upload type. Internal Server Error!")
+}
 
-// "http://localhost" + port
+func determineUploadType() {
+
+	function := unableToDetermine
+
+	switch r.Header["X_Upload_Type"] {
+	case "static", "Static", "onetime", "OneTime":
+		function = "upload_static" // static files like zip or html without versioning (below code to SaveFile)
+	case "versioned_files", "VersionedFiles":
+		function = upload_versioned
+	case "data_point", "data_points", "dataPoint", "dataPoints":
+		function = "upload_data" // data points like key/value one or multiple
+	case "table", "Table":
+		function = "upload_table" // json or CSV formats
+	case "parallel", "Parallel":
+		function = "upload_parallel" // multiple files to be put into the same location appended
+
+	default:
+		function = unableToDetermine
+
+	}
+	return function()
+}
+
 func saveFile(w http.ResponseWriter, r *http.Request) {
 	// 0. generate random id
 	dirName := randomString(randomStringLength)
@@ -46,6 +61,7 @@ func saveFile(w http.ResponseWriter, r *http.Request) {
 	action := getAction(extension)
 
 	// 4. perform action of unzip or nothing
+	// 5. TODO - add symlinks as per provided option
 	output := performAction(action, directory, fileName)
 	fmt.Fprintf(w, "\n"+output+"\n")
 
