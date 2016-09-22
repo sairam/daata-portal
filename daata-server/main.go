@@ -20,7 +20,7 @@ func main() {
 	http.HandleFunc("/r/", Redirect)
 	http.HandleFunc("/d/", openDir)
 	http.HandleFunc("/upload", saveFile)
-	http.HandleFunc("/", help)
+	http.HandleFunc("/", Help)
 	http.ListenAndServe(port, nil)
 }
 
@@ -34,6 +34,16 @@ func openDir(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(p)
 		http.NotFound(w, r)
 	}
+}
+
+// Upload data
+func Upload(w http.ResponseWriter, r *http.Request) {
+	saveFile(w, r)
+}
+
+// Help data
+func Help(w http.ResponseWriter, _ *http.Request) {
+	help(w)
 }
 
 //

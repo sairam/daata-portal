@@ -2,7 +2,7 @@ package main
 
 import (
 	"html/template"
-	"net/http"
+	"io"
 )
 
 // Data is of type string with a URL
@@ -10,15 +10,16 @@ type Data struct {
 	URL string
 }
 
-func help(w http.ResponseWriter, _ *http.Request) {
-
-	t, _ := template.New("foo").Parse(`
+const helpInfo = `
 curl -i -X POST {{.URL}}/upload -H "Content-Type: application/zip" --data-binary "@data.zip"
 curl -i -X POST {{.URL}}/upload -H "Content-Type: application/json" --data-binary "@freshmenu.json"
 
 Examples:
 {{.URL}}/d/wwpbbi
 {{.URL}}/d/iwhspu
-`)
+`
+
+func help(w io.Writer) {
+	t, _ := template.New("").Parse(helpInfo)
 	t.Execute(w, Data{URL: serverURL})
 }
