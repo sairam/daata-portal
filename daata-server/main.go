@@ -11,13 +11,16 @@ const randomStringLength = 6
 const port = ":8001"
 const serverURL = "https://21ae9584.ap.ngrok.io"
 
+//RedirectPrefix is required to generate redirect links
+const RedirectPrefix = "/r"
+
 func main() {
 	fmt.Printf("Hello Server is on localhost%s\n", port)
 	// action := getAction("zip")
 	// performAction(action, "../tmp/test12", "test12.zip")
 	// fmt.Println(randomString(randomStringLength))
 
-	http.HandleFunc("/r/", Redirect)
+	http.HandleFunc(RedirectPrefix+"/", Redirect)
 	http.HandleFunc("/d/", openDir)
 	http.HandleFunc("/upload", saveFile)
 	http.HandleFunc("/", Help)

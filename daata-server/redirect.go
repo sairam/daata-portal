@@ -1,24 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
-
+// TODO use these structs
 type urlShortner struct {
 	shortURL string
 	longURL  string
-}
-
-type model struct {
-	urlShortner
 }
 
 type urlShortnerForm struct {
@@ -26,78 +19,79 @@ type urlShortnerForm struct {
 	Override bool
 }
 
-func query(shortURL string) (string, error) {
-	var longURL string
-	err := db.QueryRow("SELECT long_url FROM tiny_urls WHERE short_url = ?", shortURL).Scan(&longURL)
-	switch {
-	case err == sql.ErrNoRows:
-		log.Printf("No user with that ID.")
-		// case err != nil:
-		// 	return (longURL,err)
-		// default:
-		// 	return (longURL, nil)
-	}
-	return longURL, err
+/* Query Data Store */
 
+// returns true if the file exists
+// returns false if the file does not exist
+func exists(shortURL string) bool {
+	file, err := os.Open(shortURL)
+	if err != nil {
+		return false
+	}
+	file.Close()
+	return true
 }
 
-func insert(shortURL, longURL string) error {
-	stmt, err := db.Prepare("INSERT INTO tiny_urls VALUES( ?, ? )")
+func read(shortURL string) (string, error) {
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+
+	fmt.Println(shortURL)
+	data, err := ioutil.ReadFile(shortURL)
 	if err != nil {
+		return "", err
+	}
+
+	dataStr := string(data)
+	longURL := strings.Split(dataStr, "\n")[0]
+
+	return longURL, nil
+}
+
+func moveToDir() func() string {
+	i := 0
+	pwd, _ := os.Getwd()
+	dataDir := "../data/r/"
+	return func() string {
+		if i == 0 {
+			return dataDir
+		}
+		return pwd
+	}
+}
+func insert(shortURL, longURL string) error {
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+
+	file, err := os.OpenFile(shortURL, os.O_WRONLY|os.O_CREATE, os.FileMode(0600))
+	if err != nil {
+		fmt.Println(err)
 		return err
 	}
-	_, err = stmt.Exec(shortURL, longURL)
 
-	defer stmt.Close()
-	return err
+	defer file.Close()
+	file.WriteString(longURL + "\n")
+	return nil
 }
 
 func update(shortURL, longURL string) error {
-	stmt, err := db.Prepare("UPDATE tiny_urls SET long_url = ? WHERE short_url = ? LIMIT 1")
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+
+	file, err := os.OpenFile(shortURL, os.O_WRONLY, os.FileMode(0600))
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(longURL, shortURL)
-
-	defer stmt.Close()
-	return err
+	defer file.Close()
+	file.Truncate(0)
+	file.WriteString(longURL + "\n")
+	return nil
 }
 
-func setupMigrations() {
-	_ = `
-  CREATE TABLE tiny_urls (
-   id int(11) unsigned NOT NULL AUTO_INCREMENT,
-   short_url varchar(100) NOT NULL DEFAULT '',
-   long_url tinytext NOT NULL,
-   PRIMARY KEY (id),
-   UNIQUE KEY short_url (short_url)
- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-  `
-	// TODO: Add company_id, user_id who added this.
-	// company_id is used for scope
-}
-
-// Setup is a one time function call to perform migrations and index updates
-func init() {
-	db, err := sql.Open("mysql", "root@/daata")
-	if err != nil {
-		panic(err.Error()) // Just for example purpose. You should use proper error handling instead of panic
-	}
-	// defer db.Close()
-
-	// Open doesn't open a connection. Validate DSN data:
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
-	}
-	fmt.Println("Initialized DB connection")
-
-	// Migrate the schema
-	// db.AutoMigrate(&model{})
-
-	setupMigrations()
-}
-
+/* Service Layer */
 // shortURL without protocol, just a string of [a-zA-Z0-9-/] are allowed
 // longURL can be anything including http, https, itunes urls or any other.
 // for now limit to http, https for regular users.
@@ -117,13 +111,14 @@ func upsertshortURL(shortURL, longURL string) error {
 
 func makeEntryEvenIfExists(shortURL, longURL string, override bool) error {
 	function := insert
-	if existingURL, _ := query(shortURL); existingURL != "" {
+	if exists(shortURL) {
 		function = update
 	}
 	return function(shortURL, longURL)
 }
 
-func createNewURL(shortURL, longURL string, update bool) (string, error) {
+// CreateOrUpdateURL is the main method to add a new redirect
+func CreateOrUpdateURL(shortURL, longURL string, update bool) (string, error) {
 	if shortURL == "" {
 		shortURL = randomString(6)
 	}
@@ -133,36 +128,102 @@ func createNewURL(shortURL, longURL string, update bool) (string, error) {
 	} else {
 		insertshortURL(shortURL, longURL)
 	}
-	// TODO save into DB
 	// update
 	return "", nil
 }
 
-func findNewURL(str string) string {
-	// TODO: query in DB
-	return map[string]string{
-		"test":   "https://www.google.com",
-		"hello":  "http://www.hellobar.com",
-		"yellow": "/yellow",
-	}[str[1:]]
+// add caching if required in service layer
+func findRedirectURL(shortURL string) (string, error) {
+	return read(shortURL)
 }
 
-// Redirect is the main method which takes care of this functionality
+func stripPrefix(path string) string {
+	if p := strings.TrimPrefix(path, RedirectPrefix); len(p) < len(path) {
+		if p[0] == '/' {
+			return p[1:]
+		}
+		return p
+	}
+	return ""
+}
+
+// TODO - check how to make this cleaner
+func validate(shortURL, longURL string) error {
+	var err error
+
+	err = validateShortURL(shortURL)
+	if err != nil {
+		return err
+	}
+
+	err = validateBlankURL(longURL)
+	if err != nil {
+		return err
+	}
+
+	valid, err = validateLongURL(longURL)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		err = validateRelativePath(longURL)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func validateShortURL(_ string) error {
+	// validate if its a valid file system path
+	return nil
+}
+
+func validateBlankURL(str string) error {
+	if str == "" {
+		return errors.new("long_url is blank")
+	}
+	return nil
+}
+
+func validateRelativePath(str string) error {
+	if str[0] != '/' {
+		return errors.new("url does not start with '/'")
+	}
+	// ensure does not have script tag
+	return nil
+}
+
+func validateLongURL(_ string) (bool, error) {
+	// TODO check if url starts with http or https
+	return true, nil
+}
+
+func stripIfRedirect(path string) (string, bool) {
+	redirect := true
+	length := len(path) - 1
+	if path[length] == '+' {
+		redirect = false
+		path = path[:length]
+	}
+	return path, redirect
+}
+func parseOverride(str string) bool {
+	return (str == "true")
+}
+
+// Redirect is the main method which takes care of redirecting
 // TODO Check Auth
 func Redirect(w http.ResponseWriter, r *http.Request) {
-	prefix := "/r"
-	redirect := true
-	if p := strings.TrimPrefix(r.URL.Path, prefix); len(p) < len(r.URL.Path) {
-		fmt.Println(p)
-		length := len(p) - 1
-		if p[length] == '+' {
-			redirect = false
-			p = p[:length]
-		}
-		url := findNewURL(p)
-		fmt.Println(url)
-		fmt.Println(p)
-		if url == "" {
+	shortURL := stripPrefix(r.URL.Path)
+	switch r.Method {
+	case http.MethodGet:
+		path, redirect := stripIfRedirect(shortURL)
+		url, err := findRedirectURL(path)
+
+		if err != nil || url == "" {
 			http.NotFound(w, r)
 		} else {
 			if redirect {
@@ -171,7 +232,25 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, url)
 			}
 		}
-	} else {
+	case http.MethodPost:
+		// err := r.ParseForm()
+		err := r.ParseMultipartForm(5000)
+		if err != nil {
+			// request Content-Type isn't multipart/form-data if r.ParseForm()
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		}
+		shortURL, longURL := r.Form.Get("short_url"), r.Form.Get("long_url")
+		override := parseOverride(r.Form.Get("override"))
+		url, err := CreateOrUpdateURL(shortURL, longURL, override)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+		} else {
+			fmt.Fprintf(w, url)
+		}
+
+	default:
 		http.NotFound(w, r)
 	}
+
 }
