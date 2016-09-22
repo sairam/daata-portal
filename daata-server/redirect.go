@@ -270,5 +270,11 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.NotFound(w, r)
 	}
+}
 
+//RedirectPrefix is required to generate redirect links
+const RedirectPrefix = "/r"
+
+func init() {
+	http.HandleFunc(RedirectPrefix+"/", Redirect)
 }
