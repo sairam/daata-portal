@@ -14,8 +14,10 @@ type StaticWebsiteInfo struct {
 	Website string
 }
 
+// mapping "" to Helper probably maps to multiple urls including blank
+// we should avoid this and find a cleaner way to map the home page.
 var staticURLMappings = map[string]string{
-	"":        "usage", // index
+	// "":        "usage", // index
 	"help":    "usage",
 	"about":   "about",
 	"docs":    "docs",
@@ -27,7 +29,7 @@ var staticURLMappings = map[string]string{
 func page(name string, w io.Writer) {
 	filename := staticURLMappings[name]
 	if filename == "" {
-		filename = staticURLMappings[""]
+		filename = staticURLMappings["help"]
 	}
 	filename += ".tmpl"
 	t, err := template.New(filename).ParseFiles("tmpl/" + filename)

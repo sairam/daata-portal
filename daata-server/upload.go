@@ -10,6 +10,11 @@ import (
 /*
   upload.go determines based on the parameters or existing directory structure
   which functions to call.
+
+  1. Static files which are versioned and/or aliased identified by Type: 'VD'
+  2. Static files which are just uploaded
+  3. Data sent in form of key/value for graphs
+  4. Static files edited in UI (via markdown etc., to be updated in place)
 */
 
 //

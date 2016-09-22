@@ -28,13 +28,10 @@ func exists(shortURL string) bool {
 	dir := moveToDir()
 	os.Chdir(dir())
 	defer os.Chdir(dir())
-	fmt.Println(shortURL)
 
-	file, err := os.Open(shortURL)
-	if err != nil {
+	if _, err := os.Stat(shortURL); os.IsNotExist(err) {
 		return false
 	}
-	file.Close()
 	return true
 }
 
@@ -43,7 +40,6 @@ func read(shortURL string) (string, error) {
 	os.Chdir(dir())
 	defer os.Chdir(dir())
 
-	fmt.Println(shortURL)
 	data, err := ioutil.ReadFile(shortURL)
 	if err != nil {
 		return "", err
@@ -56,15 +52,8 @@ func read(shortURL string) (string, error) {
 }
 
 func moveToDir() func() string {
-	i := 0
-	pwd, _ := os.Getwd()
-	dataDir := "../data/r/"
-	return func() string {
-		if i == 0 {
-			return dataDir
-		}
-		return pwd
-	}
+	// this is the file system prefix
+	return moveToFromDir(RedirectPrefix + "/")
 }
 
 func insert(shortURL, longURL string) error {
@@ -74,7 +63,6 @@ func insert(shortURL, longURL string) error {
 
 	file, err := os.OpenFile(shortURL, os.O_WRONLY|os.O_CREATE, os.FileMode(0600))
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -120,10 +108,8 @@ func noOp(_, _ string) error {
 
 func makeEntryEvenIfExists(shortURL, longURL string, override bool) error {
 	function := noOp
-	fmt.Println(override)
 	if exists(shortURL) {
 		if override {
-			fmt.Println(override)
 			function = update
 		}
 	} else {
@@ -148,7 +134,10 @@ func CreateOrUpdateURL(shortURL, longURL string, update bool) (string, error) {
 
 // add caching if required in service layer
 func findRedirectURL(shortURL string) (string, error) {
-	return read(shortURL)
+	if shortURL != "" && exists(shortURL) {
+		return read(shortURL)
+	}
+	return "", errors.New("no such url exists")
 }
 
 func stripPrefix(path string) string {
@@ -191,6 +180,9 @@ func validate(shortURL, longURL string) error {
 }
 
 func validateShortURL(_ string) error {
+	// ensure there are no spaces, dots or any such
+	// whitelist with unicode chars.
+	// TODO - make a demo with emojicons
 	// validate if its a valid file system path
 	return nil
 }
@@ -248,7 +240,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		// err := r.ParseForm()
-		err := r.ParseMultipartForm(5000)
+		err := r.ParseMultipartForm(maxUploadParamsLimit)
 		if err != nil {
 			// TODO - generate form based on Content-Type
 			// application/x-www-form-urlencoded

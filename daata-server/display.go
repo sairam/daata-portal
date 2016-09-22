@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+/*
+ based on format
+ 1. Regular format is to display the data as-is
+ 2. Data Points format or JSON data format has key / value injected into a file
+ 3. Display appended file from multiple hosts
+ 4. Graphs / Dashboards
+*/
+
 // DisplayPrefix is a
 const DisplayPrefix = "/d"
 

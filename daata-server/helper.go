@@ -9,6 +9,19 @@ import (
 	"os"
 )
 
+// generates a function which returns target dir and then current dir
+func moveToFromDir(str string) func() string {
+	i := 0
+	pwd, _ := os.Getwd()
+	dataDir := dataDirectory + "/" + str
+	return func() string {
+		if i == 0 {
+			return dataDir
+		}
+		return pwd
+	}
+}
+
 func debug(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
 	for k, v := range r.Header {
