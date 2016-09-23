@@ -3,9 +3,22 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"os/exec"
 	"strings"
+)
+
+type uploadType int
+
+const (
+	undetermined uploadType = iota
+	static                  // directory/file
+	versioned               // directory/file
+	dataPoint               // inside a directory. each data point is a file
+	table                   // inside a directory, its a file
+	parallel                // per file
 )
 
 /*
@@ -18,55 +31,42 @@ import (
   4. Static files edited in UI (via markdown etc., to be updated in place)
 */
 
-func unableToDetermine(_ http.ResponseWriter, _ *http.Request) error {
+func unableToDetermine(w http.ResponseWriter, r *http.Request) error {
 	return errors.New("Unable to determine the upload type. Internal Server Error!")
 }
 
-func determineUploadType() {
+// TODO use a struct to load the type into memory
+type uploadSettings struct {
+	uploadType uploadType
+	http.ResponseWriter
+	*http.Request
+}
+
+func registerUpload() {
+}
+
+func determineUploadType(w http.ResponseWriter, r *http.Request) {
 
 	function := unableToDetermine
-
-	switch r.Header["X_Upload_Type"] {
+	// settings := &uploadSettings{undetermined, w, r}
+	switch strings.Join(r.Header["X_Upload_Type"], "") {
 	case "static", "Static", "onetime", "OneTime":
-		function = "upload_static" // static files like zip or html without versioning (below code to SaveFile)
+		function = UploadStatic // static files like zip or html without versioning (below code to SaveFile)
 	case "versioned_files", "VersionedFiles":
-		function = upload_versioned
+		function = UploadVersioned
 	case "data_point", "data_points", "dataPoint", "dataPoints":
-		function = "upload_data" // data points like key/value one or multiple
+		function = UploadDataPoints // data points like key/value one or multiple
 	case "table", "Table":
-		function = "upload_table" // json or CSV formats
+		function = UploadTable // json or CSV formats
 	case "parallel", "Parallel":
-		function = "upload_parallel" // multiple files to be put into the same location appended
+		function = UploadParallel // multiple files to be put into the same location appended
 
 	default:
 		function = unableToDetermine
 
 	}
-	return function()
-}
-
-func saveFile(w http.ResponseWriter, r *http.Request) {
-	// 0. generate random id
-	dirName := randomString(randomStringLength)
-	url := serverURL + "/d/" + dirName
-	// 1. read contents
-	data, _ := ioutil.ReadAll(r.Body)
-	debug(w, r)
-
-	// 2. save file
-	extension := strings.Split(r.Header["Content-Type"][0], "/")[1]
-	directory, fileName := saveToFile(dirName, extension, data)
-
-	// 3. determine file type
-	action := getAction(extension)
-
-	// 4. perform action of unzip or nothing
-	// 5. TODO - add symlinks as per provided option
-	output := performAction(action, directory, fileName)
-	fmt.Fprintf(w, "\n"+output+"\n")
-
-	// 5. send back url based on random id
-	fmt.Fprintf(w, "\n"+url+"\n")
+	_ = function
+	function(w, r)
 }
 
 /*
@@ -75,6 +75,39 @@ Access restriction
 If unzip file does not contain index.html, generate one with a tree.
 */
 
+//FileFormat is a should be used for understand file extension
+type FileFormat int
+
+const (
+	text FileFormat = iota + 1
+	json
+	html
+	zip
+)
+
+func performAction(format FileFormat, dir, file string) string {
+	currentDirectory, _ := os.Getwd()
+	os.Chdir(dir)
+	defer os.Chdir(currentDirectory)
+	if format == zip {
+		cmd := []string{"/usr/bin/unzip", file}
+		out, err := exec.Command(cmd[0], cmd[1]).Output()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Output is \n%s\n", out)
+		return string(out)
+	}
+	return ""
+}
+
+func getAction(ext string) FileFormat {
+	if ext == "zip" {
+		return zip
+	}
+	return text
+}
+
 func init() {
-	http.HandleFunc("/u/", saveFile)
+	http.HandleFunc("/u/", determineUploadType)
 }

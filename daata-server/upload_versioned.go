@@ -1,5 +1,7 @@
 package main
 
+import "net/http"
+
 // Versioned Documents
 // Header - Alias
 // Header - Version
@@ -32,3 +34,9 @@ curl -X POST \
 
   use -F needn't set "Content-Type: multipart/form-data"
 */
+
+// UploadVersioned is
+func UploadVersioned(w http.ResponseWriter, r *http.Request) error {
+	return nil
+
+}

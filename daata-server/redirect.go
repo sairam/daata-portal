@@ -223,6 +223,7 @@ func parseOverride(str string) bool {
 // Redirect is the main method which takes care of redirecting
 // TODO Check Auth
 func Redirect(w http.ResponseWriter, r *http.Request) {
+	// TODO - look at StripPrefix handler
 	shortURL := stripPrefix(r.URL.Path)
 	switch r.Method {
 	case http.MethodGet:
