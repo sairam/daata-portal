@@ -1,10 +1,13 @@
-package main
+package static
 
 import (
 	"fmt"
 	"html/template"
 	"io"
 	"net/http"
+	"strings"
+
+	"../config"
 )
 
 // StaticWebsiteInfo is of type string with a URL / Contact / Website
@@ -29,19 +32,23 @@ var staticURLMappings = map[string]string{
 func page(name string, w io.Writer) {
 	filename := staticURLMappings[name]
 	if filename == "" {
+		fmt.Println("mapping did not match for " + name)
 		filename = staticURLMappings["help"]
 	}
 	filename += ".tmpl"
-	t, err := template.New(filename).ParseFiles("tmpl/" + filename)
+	fmt.Println(config.StaticDirectory + "tmpl/" + filename)
+	t, err := template.New(filename).ParseFiles(config.StaticDirectory + "tmpl/" + filename)
 	if err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
-	t.Execute(w, StaticWebsiteInfo{URL: serverURL})
+	t.Execute(w, StaticWebsiteInfo{URL: config.ServerURL})
 }
 
 // StaticPage documentation
 func StaticPage(w http.ResponseWriter, r *http.Request) {
-	page(r.URL.Path, w)
+	path := "" + r.URL.Path
+	path = strings.TrimLeft(path, "/")
+	page(path, w)
 }
 
 func init() {

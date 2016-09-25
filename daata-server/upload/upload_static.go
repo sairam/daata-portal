@@ -1,10 +1,13 @@
-package main
+package upload
 
 import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"../config"
+	"../utils"
 )
 
 /*
@@ -17,15 +20,15 @@ import (
 // UploadStatic files
 func UploadStatic(w http.ResponseWriter, r *http.Request) error {
 	// 0. generate random id
-	dirName := randomString(randomStringLength)
-	url := serverURL + "/d/" + dirName
+	dirName := utils.RandomString(config.RandomStringLength)
+	url := config.ServerURL + "/d/" + dirName
 	// 1. read contents
 	data, _ := ioutil.ReadAll(r.Body)
-	debug(w, r)
+	utils.DebugHTTP(w, r)
 
 	// 2. save file
 	extension := strings.Split(r.Header["Content-Type"][0], "/")[1]
-	directory, fileName := saveToFile(dirName, extension, data)
+	directory, fileName := utils.SaveToFile(dirName, extension, data)
 
 	// 3. determine file type
 	action := getAction(extension)

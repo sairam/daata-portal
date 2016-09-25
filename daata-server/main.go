@@ -3,18 +3,19 @@ package main
 import (
 	"fmt"
 	"net/http"
-)
 
-const randomStringLength = 6
-const port = ":8001"
-const serverURL = "https://21ae9584.ap.ngrok.io"
-const dataDirectory = "../data/"
-const maxUploadParamsLimit = 5000
+	"./config"
+	_ "./display"
+	_ "./redirect"
+	_ "./static"
+	_ "./upload"
+	_ "./utils"
+)
 
 // This is to be used in all upload forms
 
 func main() {
-	fmt.Printf("Hello Server is on localhost%s\n", port)
+	fmt.Printf("Hello Server is on localhost%s\n", config.Port)
 
 	//  / - index
 	//  /help - help
@@ -23,5 +24,5 @@ func main() {
 	//  /u/ - upload
 	//  /r/ - redirects
 
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(config.Port, nil)
 }

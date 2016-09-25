@@ -1,4 +1,4 @@
-package main
+package redirect
 
 import (
 	"errors"
@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"../config/"
+	"../utils/"
 )
 
 // TODO use these structs
@@ -53,7 +56,7 @@ func read(shortURL string) (string, error) {
 
 func moveToDir() func() string {
 	// this is the file system prefix
-	return moveToFromDir(RedirectPrefix + "/")
+	return utils.MoveToFromDir(RedirectPrefix + "/")
 }
 
 func insert(shortURL, longURL string) error {
@@ -121,7 +124,7 @@ func makeEntryEvenIfExists(shortURL, longURL string, override bool) error {
 // CreateOrUpdateURL is the main method to add a new redirect
 func CreateOrUpdateURL(shortURL, longURL string, update bool) (string, error) {
 	if shortURL == "" {
-		shortURL = randomString(6)
+		shortURL = utils.RandomString(6)
 	}
 	var err error
 	if update {
@@ -241,7 +244,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		// err := r.ParseForm()
-		err := r.ParseMultipartForm(maxUploadParamsLimit)
+		err := r.ParseMultipartForm(config.MaxUploadParamsLimit)
 		if err != nil {
 			// TODO - generate form based on Content-Type
 			// application/x-www-form-urlencoded
@@ -252,6 +255,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 		shortURL, longURL := r.Form.Get("short_url"), r.Form.Get("long_url")
 		override := parseOverride(r.Form.Get("override"))
+		fmt.Println(shortURL)
 		url, err := CreateOrUpdateURL(shortURL, longURL, override)
 
 		if err != nil {

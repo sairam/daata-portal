@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"crypto/rand"
@@ -7,13 +7,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"../config/"
 )
 
+// MoveToFromDir ..
 // generates a function which returns target dir and then current dir
-func moveToFromDir(str string) func() string {
+func MoveToFromDir(str string) func() string {
 	i := 0
 	pwd, _ := os.Getwd()
-	dataDir := dataDirectory + "/" + str
+	dataDir := config.DataDirectory + "/" + str
 	return func() string {
 		if i == 0 {
 			return dataDir
@@ -22,7 +25,8 @@ func moveToFromDir(str string) func() string {
 	}
 }
 
-func debug(w http.ResponseWriter, r *http.Request) {
+// DebugHTTP ..
+func DebugHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
 	for k, v := range r.Header {
 		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
@@ -37,8 +41,9 @@ func debug(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func saveToFile(name, extension string, data []byte) (string, string) {
-	dir := "../tmp/" + name
+// SaveToFile ..
+func SaveToFile(name, extension string, data []byte) (string, string) {
+	dir := config.UploadDirectory + name
 	fileName := name + "." + extension
 	os.Mkdir(dir, 0700)
 	ioutil.WriteFile(dir+"/"+fileName, data, 0600)
@@ -46,7 +51,8 @@ func saveToFile(name, extension string, data []byte) (string, string) {
 	return dir, fileName
 }
 
-func randomString(length int) string {
+// RandomString ..
+func RandomString(length int) string {
 	const alphanum = "abcdefghijklmnopqrstuvwxyz" // "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var bytes = make([]byte, length)
 	rand.Read(bytes)
