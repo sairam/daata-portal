@@ -1,4 +1,4 @@
-package integration_test
+package redirect_i_test
 
 import (
 	"bytes"
