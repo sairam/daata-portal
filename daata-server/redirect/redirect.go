@@ -12,9 +12,11 @@ import (
 	"../utils/"
 )
 
-type datainterface interface {
+type persistInterface interface {
 	exists() bool
 	read()
+	insert() error
+	update() error
 }
 
 // TODO use these structs
