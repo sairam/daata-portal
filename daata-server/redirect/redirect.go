@@ -12,46 +12,77 @@ import (
 	"../utils/"
 )
 
+type datainterface interface {
+	exists() bool
+	read()
+}
+
 // TODO use these structs
 type urlShortner struct {
 	shortURL string
 	longURL  string
-}
-
-type urlShortnerForm struct {
-	urlShortner
-	Override bool
+	override bool
 }
 
 /* Query Data Store */
 
 // returns true if the file exists
 // returns false if the file does not exist
-func exists(shortURL string) bool {
+func (u *urlShortner) exists() bool {
 	dir := moveToDir()
 	os.Chdir(dir())
 	defer os.Chdir(dir())
 
-	if _, err := os.Stat(shortURL); os.IsNotExist(err) {
+	if _, err := os.Stat(u.shortURL); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
-func read(shortURL string) (string, error) {
+func (u *urlShortner) read() error {
 	dir := moveToDir()
 	os.Chdir(dir())
 	defer os.Chdir(dir())
 
-	data, err := ioutil.ReadFile(shortURL)
+	data, err := ioutil.ReadFile(u.shortURL)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	dataStr := string(data)
-	longURL := strings.Split(dataStr, "\n")[0]
+	u.longURL = strings.Split(dataStr, "\n")[0]
 
-	return longURL, nil
+	return nil
+}
+
+func (u *urlShortner) insert() error {
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+
+	file, err := os.OpenFile(u.shortURL, os.O_WRONLY|os.O_CREATE, os.FileMode(0600))
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+	file.WriteString(u.longURL + "\n")
+	return nil
+}
+
+func (u *urlShortner) update() error {
+	dir := moveToDir()
+	os.Chdir(dir())
+	defer os.Chdir(dir())
+
+	file, err := os.OpenFile(u.shortURL, os.O_WRONLY, os.FileMode(0600))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	file.Truncate(0)
+	file.WriteString(u.longURL + "\n")
+	return nil
 }
 
 func moveToDir() func() string {
@@ -59,34 +90,9 @@ func moveToDir() func() string {
 	return utils.MoveToFromDir(RedirectPrefix + "/")
 }
 
-func insert(shortURL, longURL string) error {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	file, err := os.OpenFile(shortURL, os.O_WRONLY|os.O_CREATE, os.FileMode(0600))
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-	file.WriteString(longURL + "\n")
-	return nil
-}
-
-func update(shortURL, longURL string) error {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	file, err := os.OpenFile(shortURL, os.O_WRONLY, os.FileMode(0600))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	file.Truncate(0)
-	file.WriteString(longURL + "\n")
-	return nil
+type serviceInterface interface {
+	Validate() error
+	CreateOrUpdate() error
 }
 
 /* Service Layer */
@@ -95,52 +101,34 @@ func update(shortURL, longURL string) error {
 // for now limit to http, https for regular users.
 // leading and trailing slashes will be removed.
 
-// insert query, don't update
-func insertshortURL(shortURL, longURL string) error {
-	return makeEntryEvenIfExists(shortURL, longURL, false)
-}
-
-// upsert query
-func upsertshortURL(shortURL, longURL string) error {
-	return makeEntryEvenIfExists(shortURL, longURL, true)
-}
-
-func noOp(_, _ string) error {
+func (u *urlShortner) noOp() error {
 	return errors.New("could not process")
 }
 
-func makeEntryEvenIfExists(shortURL, longURL string, override bool) error {
-	function := noOp
-	if exists(shortURL) {
-		if override {
-			function = update
+// CreateOrUpdateURL is the main method to add a new redirect
+func (u *urlShortner) CreateOrUpdate() error {
+	if u.shortURL == "" {
+		u.shortURL = utils.RandomString(6)
+	}
+	// insert on false
+	// update on true
+
+	if u.exists() {
+		if u.override {
+			return u.update()
 		}
 	} else {
-		function = insert
+		return u.insert()
 	}
-	return function(shortURL, longURL)
-}
-
-// CreateOrUpdateURL is the main method to add a new redirect
-func CreateOrUpdateURL(shortURL, longURL string, update bool) (string, error) {
-	if shortURL == "" {
-		shortURL = utils.RandomString(6)
-	}
-	var err error
-	if update {
-		err = upsertshortURL(shortURL, longURL)
-	} else {
-		err = insertshortURL(shortURL, longURL)
-	}
-	return shortURL, err
+	return u.noOp()
 }
 
 // add caching if required in service layer
-func findRedirectURL(shortURL string) (string, error) {
-	if shortURL != "" && exists(shortURL) {
-		return read(shortURL)
+func (u *urlShortner) Find() error {
+	if u.shortURL != "" && u.exists() {
+		return u.read()
 	}
-	return "", errors.New("no such url exists")
+	return errors.New("no such url exists")
 }
 
 func stripPrefix(path string) string {
@@ -154,26 +142,26 @@ func stripPrefix(path string) string {
 }
 
 // TODO - check how to make this cleaner
-func validate(shortURL, longURL string) error {
+func (u *urlShortner) Validate() error {
 	var err error
 
-	err = validateShortURL(shortURL)
+	err = validateShortURL(u.shortURL)
 	if err != nil {
 		return err
 	}
 
-	err = validateBlankURL(longURL)
+	err = validateBlankURL(u.longURL)
 	if err != nil {
 		return err
 	}
 
-	valid, err := validateLongURL(longURL)
+	valid, err := validateLongURL(u.longURL)
 	if err != nil {
 		return err
 	}
 
 	if !valid {
-		err = validateRelativePath(longURL)
+		err = validateRelativePath(u.longURL)
 		if err != nil {
 			return err
 		}
@@ -219,6 +207,7 @@ func stripIfRedirect(path string) (string, bool) {
 	}
 	return path, redirect
 }
+
 func parseOverride(str string) bool {
 	return (str == "true")
 }
@@ -231,7 +220,9 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		path, redirect := stripIfRedirect(shortURL)
-		url, err := findRedirectURL(path)
+		u := &urlShortner{shortURL: path}
+		err := u.Find()
+		url := u.longURL
 
 		if err != nil || url == "" {
 			http.NotFound(w, r)
@@ -255,13 +246,13 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 		shortURL, longURL := r.Form.Get("short_url"), r.Form.Get("long_url")
 		override := parseOverride(r.Form.Get("override"))
-		fmt.Println(shortURL)
-		url, err := CreateOrUpdateURL(shortURL, longURL, override)
+		u := &urlShortner{shortURL: shortURL, longURL: longURL, override: override}
+		err = u.CreateOrUpdate()
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusForbidden)
 		} else {
-			fmt.Fprintf(w, url)
+			fmt.Fprintf(w, u.shortURL)
 		}
 
 	default:

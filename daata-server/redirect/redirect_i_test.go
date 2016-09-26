@@ -1,4 +1,4 @@
-package redirect_i_test
+package redirect_test
 
 import (
 	"bytes"
