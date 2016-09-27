@@ -52,7 +52,7 @@ func saveToTempLocation(data []byte) (string, string, error) {
 // AppendToFile ..
 func AppendToFile(filename string, data []byte) (string, error) {
 
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return filename, err
 	}
