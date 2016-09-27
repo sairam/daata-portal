@@ -19,6 +19,7 @@ func MoveToFromDir(str string) func() string {
 	dataDir := config.DataDirectory + "/" + str
 	return func() string {
 		if i == 0 {
+			i++
 			return dataDir
 		}
 		return pwd
@@ -31,7 +32,7 @@ func DebugHTTP(w http.ResponseWriter, r *http.Request) {
 	for k, v := range r.Header {
 		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
 	}
-	fmt.Fprintf(w, "Hos = %q\n", r.Host)
+	fmt.Fprintf(w, "Host = %q\n", r.Host)
 	fmt.Fprintf(w, "RemoteAddr = %q\n", r.RemoteAddr)
 	if err := r.ParseForm(); err != nil {
 		log.Print(err)
@@ -42,13 +43,12 @@ func DebugHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // SaveToFile ..
-func SaveToFile(name, extension string, data []byte) (string, string) {
-	dir := config.UploadDirectory + name
-	fileName := name + "." + extension
-	os.Mkdir(dir, 0700)
-	ioutil.WriteFile(dir+"/"+fileName, data, 0600)
-	fmt.Println("Created file")
-	return dir, fileName
+func SaveToFile(filename string, data []byte) (string, error) {
+	// filepath := strings.Join([]string{parentDir, filename}, string(os.PathSeparator))
+	err := ioutil.WriteFile(filename, data, 0600)
+	wd, _ := os.Getwd()
+	fmt.Printf("Created file at %s, %s\n", filename, wd)
+	return filename, err
 }
 
 // RandomString ..

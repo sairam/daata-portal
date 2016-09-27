@@ -20,11 +20,12 @@ import (
 const DisplayPrefix = "/d"
 
 func openDir(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL.Path)
 	if p := strings.TrimPrefix(r.URL.Path, DisplayPrefix); len(p) < len(r.URL.Path) {
 		r.URL.Path = p
 		// check auth here
 		// TODO - fix directory here from config
-		http.FileServer(http.Dir(config.UploadDirectory)).ServeHTTP(w, r)
+		http.FileServer(http.Dir(config.DataDirectory)).ServeHTTP(w, r)
 	} else {
 		fmt.Println(p)
 		http.NotFound(w, r)

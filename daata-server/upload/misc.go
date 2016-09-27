@@ -25,6 +25,12 @@ func Static(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// StaticNoOverride ..
+func StaticNoOverride(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}
+
 // DataPoints is
 func DataPoints(w http.ResponseWriter, r *http.Request) error {
 	return nil
