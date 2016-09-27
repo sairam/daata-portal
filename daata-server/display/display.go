@@ -31,6 +31,11 @@ func openDir(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Prefix specifies the download/display location of a file
+func Prefix() string {
+	return DisplayPrefix + "/"
+}
+
 func init() {
-	http.HandleFunc(DisplayPrefix+"/", openDir)
+	http.HandleFunc(Prefix(), openDir)
 }

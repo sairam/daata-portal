@@ -1,6 +1,10 @@
 package upload
 
-import "testing"
+import (
+	"testing"
+
+	ff "./fileformat"
+)
 
 func TestStripPath(t *testing.T) {
 	type tester struct {
@@ -46,17 +50,18 @@ func TestExtBasedOnContentType(t *testing.T) {
 
 }
 
+// TODO - add gz piped with tar
 func TestGetAction(t *testing.T) {
 	type tester struct {
 		input    string
-		expected fileFormat
+		expected ff.FileFormat
 	}
 
 	tests := []tester{
-		tester{"json", json},
-		tester{"plain", text},
-		tester{"html", html},
-		tester{"zip", zip},
+		tester{"json", ff.FileJSON},
+		tester{"plain", ff.FileText},
+		tester{"html", ff.FileHTML},
+		tester{"zip", ff.FileZip},
 	}
 
 	for _, test := range tests {
