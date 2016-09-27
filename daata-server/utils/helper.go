@@ -46,8 +46,8 @@ func DebugHTTP(w http.ResponseWriter, r *http.Request) {
 func SaveToFile(filename string, data []byte) (string, error) {
 	// filepath := strings.Join([]string{parentDir, filename}, string(os.PathSeparator))
 	err := ioutil.WriteFile(filename, data, 0600)
-	wd, _ := os.Getwd()
-	fmt.Printf("Created file at %s, %s\n", filename, wd)
+	// wd, _ := os.Getwd()
+	// fmt.Printf("Created file at %s, %s\n", filename, wd)
 	return filename, err
 }
 

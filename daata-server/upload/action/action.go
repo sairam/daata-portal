@@ -16,10 +16,13 @@ import (
 // Perform goes to a directory, performs the action based on the format
 // and returns to the current directory
 func Perform(format f.FileFormat, dir, file string) string {
+
 	currentDirectory, _ := os.Getwd()
 	os.Chdir(dir)
 	defer os.Chdir(currentDirectory)
+
 	if format == f.FileZip {
+		// TODO: unzip only if directory is empty
 		location := "."
 		out, err := zip.Extract(file, location)
 		if err != nil {
@@ -31,6 +34,8 @@ func Perform(format f.FileFormat, dir, file string) string {
 	}
 	return ""
 }
+
+// Cleanup zip files
 func cleanup(dir, file string) {
 	os.Remove(file)
 	files, _ := ioutil.ReadDir("./")
@@ -42,6 +47,7 @@ func cleanup(dir, file string) {
 	}
 }
 
+// move files from single sub directory to current directory
 func moveFilesToParent(dir string) error {
 	files, _ := ioutil.ReadDir(dir)
 	for _, file := range files {

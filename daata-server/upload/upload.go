@@ -31,6 +31,14 @@ const (
 	parallel                // per file
 )
 
+const (
+	HeaderVersion     = "X-Version" // HeaderVersion info
+	HeaderAlias       = "X-Alias"
+	HeaderUploadType  = "X-Upload-Type"
+	HeaderFileName    = "X-File-Name"
+	HeaderContentType = "Content-Type"
+)
+
 /*
   1. Get the path to upload the directory to
   2. Determine directory path based on other headers
@@ -58,7 +66,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 
 	function := unableToDetermine
 	// settings := &uploadSettings{undetermined, w, r}
-	switch strings.Join(r.Header["X_Upload_Type"], "") {
+	switch strings.Join(r.Header[HeaderUploadType], "") {
 	case "static", "Static", "onetime", "OneTime":
 		function = Static // static files like zip or html without versioning (below code to SaveFile)
 	case "versioned_files", "VersionedFiles":
@@ -84,9 +92,9 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 
 	// move to directory and pop out
 	dir := utils.MoveToFromDir("")
-	fmt.Println(os.Getwd())
+	// fmt.Println(os.Getwd())
 	os.Chdir(dir())
-	fmt.Println(os.Getwd())
+	// fmt.Println(os.Getwd())
 	defer os.Chdir(dir())
 
 	// get main directory to save directory
@@ -96,7 +104,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	data, _ := ioutil.ReadAll(r.Body)
 	utils.DebugHTTP(w, r)
 
-	fmt.Println(uploadLoc)
+	// fmt.Println(uploadLoc)
 
 	// save file in directory location
 	_, err := utils.SaveToFile(uploadLoc.path(), data)
@@ -113,7 +121,8 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	os.Chdir(subdir())
 
 	targetURL := config.ServerURL + display.Prefix() + convertDirectoryToPath(uploadLoc.dirpath())
-	w.Header().Add("X-Generated-URL", targetURL)
+	w.Header().Set("X-Generated-URL", targetURL)
+
 	fmt.Fprintf(w, "\n"+output+"\n")
 
 	_ = function //(w, r)
@@ -124,8 +133,13 @@ func getFilename(r *http.Request, ext string, extfrom extFrom) (string, string) 
 	var filename string
 
 	// TODO - take care of extension as well or pass a separate header for it
-	filename = r.Header.Get("X-File-Name")
+	filename = r.Header.Get(HeaderFileName)
 	if filename != "" {
+		ext1 := isWhiteListedRegexp(filename)
+		if ext1 != "" {
+			ext = ext1
+			filename = strings.Replace(filename, "."+ext, "", 1)
+		}
 		return filename, ext
 	}
 
@@ -151,20 +165,31 @@ const (
 	extContentType
 )
 
+func isWhiteListedRegexp(str string) string {
+	var extRegexp = regexp.MustCompile(`(tar\.gz|tar.bz2|gz|zip|bz2|txt|html|json|log)$`)
+	var match = extRegexp.FindStringSubmatch(str)
+	if len(match) > 0 {
+		return match[0]
+	}
+	return ""
+}
+
 func getExt(r *http.Request) (string, extFrom) {
 	d := strings.Split(r.URL.Path, httpPathSeparator)
 	lastPath := d[len(d)-1]
-
-	var extRegexp = regexp.MustCompile(`(tar\.gz|tar.bz2|gz|zip|bz2|txt|html|json|log)$`)
-	var match = extRegexp.FindStringSubmatch(lastPath)
-	if len(match) > 0 {
-		return match[0], extURLPath
+	match := isWhiteListedRegexp(lastPath)
+	if match != "" {
+		return match, extURLPath
 	}
-	return extBasedOnContentType(r.Header["Content-Type"]), extContentType
+	return extBasedOnContentType(r.Header[HeaderContentType]), extContentType
 }
 
 func extBasedOnContentType(contentType []string) string {
-	return strings.Split(contentType[0], httpPathSeparator)[1]
+	str := strings.Split(contentType[0], httpPathSeparator)[1]
+	if str == "x-www-form-urlencoded" {
+		return "txt"
+	}
+	return str
 }
 
 func generateUploadLocation(r *http.Request) *uploadLocation {
@@ -174,8 +199,6 @@ func generateUploadLocation(r *http.Request) *uploadLocation {
 	  1.3. If path is not there, create a directory under level 1 like if uploaded to /u, create /u/{123456}/
 	*/
 	dirName, ok := getFromPath(r.URL.Path)
-	fmt.Println("-------------------")
-	fmt.Println(dirName)
 	if !ok {
 		dirName = dirName + httpPathSeparator + utils.RandomString(config.RandomStringLength)
 	}
@@ -204,11 +227,11 @@ func convertDirectoryToPath(path string) string {
 }
 
 func getSubDirectory(header http.Header) string {
-	return header.Get("X-Version")
+	return header.Get(HeaderVersion)
 }
 
 func getSoftLinks(header http.Header) []string {
-	return strings.Split(header.Get("X-Alias"), ",")
+	return strings.Split(header.Get(HeaderAlias), ",")
 }
 
 // TODO - change name to getDirectory from Path and add below changes

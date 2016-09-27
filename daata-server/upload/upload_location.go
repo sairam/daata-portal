@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -25,7 +24,7 @@ func (u *uploadLocation) clean() error {
 
 // Generate the directory structure
 func (u *uploadLocation) generateDirectory() error {
-	fmt.Println("created directory at ", u.dirpath())
+	// fmt.Println("created directory at ", u.dirpath())
 	err := os.MkdirAll(u.dirpath(), config.DirectoryPermissions)
 	return err
 }
@@ -59,13 +58,13 @@ func (u *uploadLocation) makeAliases() []error {
 	if u.subdir == "" {
 		return err
 	}
-	fmt.Printf("Aliases are %v\n", u.aliases)
+	// fmt.Printf("Aliases are %v\n", u.aliases)
 
 	for _, alias := range u.aliases {
 		os.Remove(alias)
 		lerr := os.Symlink(u.subdir, alias)
 		if lerr != nil {
-			fmt.Println(lerr)
+			// fmt.Println(lerr)
 			err = append(err, lerr)
 		}
 	}
