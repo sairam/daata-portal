@@ -62,8 +62,10 @@ func (u *uploadLocation) makeAliases() []error {
 	fmt.Printf("Aliases are %v\n", u.aliases)
 
 	for _, alias := range u.aliases {
+		os.Remove(alias)
 		lerr := os.Symlink(u.subdir, alias)
 		if lerr != nil {
+			fmt.Println(lerr)
 			err = append(err, lerr)
 		}
 	}

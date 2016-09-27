@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
+	"strings"
 
 	f "../fileformat"
 	_ "./gz"  // f
@@ -35,13 +35,19 @@ func cleanup(dir, file string) {
 	os.Remove(file)
 	files, _ := ioutil.ReadDir("./")
 	if len(files) == 1 {
-		cmd := []string{"/bin/mv", files[0].Name() + "/*", "./"}
-		fmt.Printf("No of files are %s\n", files[0].Name())
-		fmt.Println(cmd)
-		exec.Command(cmd[0], cmd[1:]...).Output()
+		file := files[0]
+		if file.IsDir() {
+			moveFilesToParent(file.Name())
+		}
 	}
-	fmt.Printf("No of files are %d\n", len(files))
-	for file := range files {
-		fmt.Println(file)
+}
+
+func moveFilesToParent(dir string) error {
+	files, _ := ioutil.ReadDir(dir)
+	for _, file := range files {
+		filename := strings.Join([]string{dir, file.Name()}, string(os.PathSeparator))
+		os.Rename(filename, file.Name())
 	}
+	os.Remove(dir)
+	return nil
 }
