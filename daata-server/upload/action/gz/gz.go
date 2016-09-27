@@ -10,20 +10,15 @@ import "os/exec"
 
 // ExtractHere extracts the file in the current directory.
 // Also provide output on the details of the files
-func ExtractHere(file string) ([]byte, error) {
-	return Extract(file, ".")
+func ExtractHere(file string) (string, string, error) {
+	return Decompress(file, ".")
 }
 
-// FIXME
 // Extract file to a particular location
+// FIXME
 // Also provide output on the details of the files
-func Extract(file, location string) ([]byte, error) {
+func Decompress(file, location string) (string, string, error) {
 	cmd := []string{"/usr/bin/gunzip", file, "-d", location}
-	return exec.Command(cmd[0], cmd[1:]...).Output()
-}
-
-// List the files in the zip
-func List(file string) ([]byte, error) {
-	cmd := []string{"/usr/bin/gunzip", "-l", file}
-	return exec.Command(cmd[0], cmd[1:]...).Output()
+	exec.Command(cmd[0], cmd[1:]...).Output()
+	return "", "", nil
 }

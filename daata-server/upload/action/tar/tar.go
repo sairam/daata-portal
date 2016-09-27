@@ -14,16 +14,10 @@ func ExtractHere(file string) ([]byte, error) {
 	return Extract(file, ".")
 }
 
-// FIXME
 // Extract file to a particular location
+// FIXME
 // Also provide output on the details of the files
 func Extract(file, location string) ([]byte, error) {
 	cmd := []string{"/usr/bin/tar", "-cf", file, "-d", location}
-	return exec.Command(cmd[0], cmd[1:]...).Output()
-}
-
-// List the files in the zip
-func List(file string) ([]byte, error) {
-	cmd := []string{"/usr/bin/tar", "-xf", file}
 	return exec.Command(cmd[0], cmd[1:]...).Output()
 }

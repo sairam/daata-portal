@@ -7,32 +7,83 @@ import (
 	"os"
 	"strings"
 
-	f "../fileformat"
-	_ "./gz"  // f
-	_ "./tar" // f
+	ff "../fileformat"
+	"./gz"
+	"./tar"
 	"./zip"
 )
 
+// Settings are required to perform actions in the order we require
+type Settings struct {
+	CompressionType ff.CompressionFormat // tar.bz2 - first its uncompressed
+	ArchiveType     ff.ArchiveFormat     // second, its untarred or unzipped
+	AppendMode      bool                 // append mode or override file
+}
+
 // Perform goes to a directory, performs the action based on the format
 // and returns to the current directory
-func Perform(format f.FileFormat, dir, file string) string {
+func Perform(settings *Settings, dir, file string) string {
 
 	currentDirectory, _ := os.Getwd()
 	os.Chdir(dir)
 	defer os.Chdir(currentDirectory)
+	location := "."
 
-	if format == f.FileZip {
-		// TODO: unzip only if directory is empty
-		location := "."
-		out, err := zip.Extract(file, location)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Output is \n%s\n", out)
-		cleanup(dir, file)
-		return string(out)
+	file = decompress(settings, file, location)
+	dirPath, requiresCleanup := unarchive(settings, file, location)
+	if requiresCleanup {
+		cleanup(dirPath, file)
 	}
+
 	return ""
+}
+
+func unarchive(settings *Settings, file, location string) (string, bool) {
+	var err error
+	var out []byte
+	var cleanup = true
+
+	switch settings.ArchiveType {
+	case ff.ArchiveZip:
+		out, err = zip.Extract(file, location)
+	case ff.ArchiveTar:
+		out, err = tar.Extract(file, location)
+	default:
+		out, err = []byte{}, nil
+		cleanup = false
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Output is \n%s\n", out)
+
+	// TODO - remove archived file
+	// return string(out)
+	return location, cleanup
+
+}
+
+func decompress(settings *Settings, file, location string) string {
+	var newFile, oldFile string
+	var err error
+
+	switch settings.CompressionType {
+	case ff.CompressionGz:
+		newFile, oldFile, err = gz.Decompress(file, location)
+	case ff.CompressionBz2:
+		// TODO , fix me
+		newFile, oldFile, err = gz.Decompress(file, location)
+	default:
+		newFile, oldFile, err = file, "", nil
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
+	if oldFile != "" {
+		os.Remove(oldFile)
+	}
+	// TODO - remove oldFile if present
+	return newFile
 }
 
 // Cleanup zip files

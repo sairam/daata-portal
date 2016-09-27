@@ -36,6 +36,7 @@ const (
 	HeaderAlias       = "X-Alias"
 	HeaderUploadType  = "X-Upload-Type"
 	HeaderFileName    = "X-File-Name"
+	HeaderAppend      = "X-Append" // used for Parallel writes
 	HeaderContentType = "Content-Type"
 )
 
@@ -65,7 +66,6 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	// Determine aliases types etc., Default is static.
 
 	function := unableToDetermine
-	// settings := &uploadSettings{undetermined, w, r}
 	switch strings.Join(r.Header[HeaderUploadType], "") {
 	case "static", "Static", "onetime", "OneTime":
 		function = Static // static files like zip or html without versioning (below code to SaveFile)
@@ -88,7 +88,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	}
 	// Determine location to upload
 	uploadLoc := generateUploadLocation(r)
-	theaction := getAction(uploadLoc.extension)
+	compressionType, archiveType := getAction(uploadLoc.extension)
 
 	// move to directory and pop out
 	dir := utils.MoveToFromDir("")
@@ -104,14 +104,24 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	data, _ := ioutil.ReadAll(r.Body)
 	utils.DebugHTTP(w, r)
 
-	// fmt.Println(uploadLoc)
+	fmt.Println(uploadLoc)
+	// fmt.Println(string(data))
 
 	// save file in directory location
 	_, err := utils.SaveToFile(uploadLoc.path(), data)
 	if err != nil {
 		fmt.Println(err)
 	}
-	output := action.Perform(theaction, uploadLoc.dirpath(), uploadLoc.filepath())
+
+	settings := &action.Settings{
+		AppendMode:      isAppend(r.Header),
+		CompressionType: compressionType,
+		ArchiveType:     archiveType,
+	}
+
+	// _ = settings
+	// output := "hello"
+	output := action.Perform(settings, uploadLoc.dirpath(), uploadLoc.filepath())
 
 	// Aliases are to be made after the action is done.
 	// This is to ensure failure of unzip or other misc actions do not point to a failed location
@@ -234,6 +244,11 @@ func getSoftLinks(header http.Header) []string {
 	return strings.Split(header.Get(HeaderAlias), ",")
 }
 
+func isAppend(header http.Header) bool {
+	return strings.ToLower(header.Get(HeaderAppend)) == "true"
+
+}
+
 // TODO - change name to getDirectory from Path and add below changes
 // Add documentation/Example about working
 // its mandatory to have a / at the end
@@ -270,46 +285,11 @@ func cleanStrings(data []string, selector string) []string {
 	return r
 }
 
-func getAction(ext string) ff.FileFormat {
-	switch ext {
-	// case "x-bzip2":
-	// 	return bz2
-	// case "x-gzip"
-	//  return gzip
-	// case "x-gtar":
-	// 	return tar
-	// tar.gz, .tgz, .tar.Z, .tar.bz2, .tbz2, .tar.lzma, .tlz
-	// TODO - decide based on file format once saved
-	// source info https://en.wikipedia.org/wiki/List_of_archive_formats
-	case "zip":
-		return ff.FileZip
-		// .zip, .zipx
-		// others to consider
-		// rar
-		// apk
-		// jar
-	case "json":
-		return ff.FileJSON
-	case "html":
-		return ff.FileHTML
-	case "plain":
-		return ff.FileText
-	default:
-		return ff.FileText
-	}
+func getAction(ext string) (ff.CompressionFormat, ff.ArchiveFormat) {
+	ext, compression := ff.FindCompressionFormat(ext)
+	_, archive := ff.FindArchiveFormat(ext)
+	return compression, archive
 }
-
-// // . Determine subdirectory to store based on other information
-// switch action {
-// case zip:
-//   // save single file
-//   // then unzip
-//   // remove/save source file
-// case html, text, json:
-//   // save single file
-//   // TODO - add for form submit type if json or encoding etc.,
-// }
-//
 
 //UploadPrefix is required to get the upload prefix
 const UploadPrefix = "/u"

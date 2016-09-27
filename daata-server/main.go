@@ -15,7 +15,7 @@ import (
 // This is to be used in all upload forms
 
 func main() {
-	fmt.Printf("Hello Server is on localhost%s\n", config.Port)
+	fmt.Printf("Server is being served on http://localhost%s\n", config.Port)
 
 	//  / - index
 	//  /help - help
