@@ -42,6 +42,27 @@ func DebugHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func saveToTempLocation(data []byte) (string, string, error) {
+	dir, err := ioutil.TempDir("", "upload")
+	file := RandomString(8)
+	err = ioutil.WriteFile(dir+file, data, 0600)
+	return dir, file, err
+}
+
+// AppendToFile ..
+func AppendToFile(filename string, data []byte) (string, error) {
+
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return filename, err
+	}
+
+	defer f.Close()
+
+	_, err = f.Write(data)
+	return filename, err
+}
+
 // SaveToFile ..
 func SaveToFile(filename string, data []byte) (string, error) {
 	// filepath := strings.Join([]string{parentDir, filename}, string(os.PathSeparator))

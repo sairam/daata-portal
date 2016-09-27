@@ -8,6 +8,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"time"
 
 	"../config"
 	"../display"
@@ -21,6 +23,12 @@ import (
 const httpPathSeparator = "/"
 
 type uploadType int
+
+// Info ..
+var Info = make(map[string]time.Time)
+
+// Locker ..
+var Locker = &sync.Mutex{}
 
 const (
 	undetermined uploadType = iota
@@ -84,8 +92,12 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 		// only supports text files
 	default:
 		function = StaticNoOverride // in case of an existing directory in the place, we will throw an error
-
 	}
+
+	// First. make a temporary location and save the file
+	// returns a temporary directory where you can move this and then move the files to new location
+	// tempDir, tempFile, err := utils.SaveToTempLocation(uploadLoc.path(), data)
+
 	// Determine location to upload
 	uploadLoc := generateUploadLocation(r)
 	compressionType, archiveType := getAction(uploadLoc.extension)
@@ -102,26 +114,39 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 
 	// read the data from the body based on type, save the file
 	data, _ := ioutil.ReadAll(r.Body)
-	utils.DebugHTTP(w, r)
-
-	fmt.Println(uploadLoc)
-	// fmt.Println(string(data))
-
-	// save file in directory location
-	_, err := utils.SaveToFile(uploadLoc.path(), data)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// utils.DebugHTTP(w, r)
+	// fmt.Println(uploadLoc)
 
 	settings := &action.Settings{
-		AppendMode:      isAppend(r.Header),
+		AppendMode:      false,
 		CompressionType: compressionType,
 		ArchiveType:     archiveType,
 	}
 
+	settings.AppendMode = isAppend(r.Header, settings)
+
+	var err error
+
+	if settings.AppendMode {
+		err = getLock(uploadLoc.path())
+		if err != nil {
+			w.WriteHeader(http.StatusGatewayTimeout)
+			return
+		}
+		_, err = utils.AppendToFile(uploadLoc.path(), data)
+		releaseLock(uploadLoc.path())
+	} else {
+		_, err = utils.SaveToFile(uploadLoc.path(), data)
+	}
+
+	// save file in directory location
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	// _ = settings
 	// output := "hello"
-	output := action.Perform(settings, uploadLoc.dirpath(), uploadLoc.filepath())
+	action.Perform(settings, uploadLoc.dirpath(), uploadLoc.filepath())
 
 	// Aliases are to be made after the action is done.
 	// This is to ensure failure of unzip or other misc actions do not point to a failed location
@@ -133,9 +158,37 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	targetURL := config.ServerURL + display.Prefix() + convertDirectoryToPath(uploadLoc.dirpath())
 	w.Header().Set("X-Generated-URL", targetURL)
 
-	fmt.Fprintf(w, "\n"+output+"\n")
+	// fmt.Fprintf(w, "\n"+output+"\n")
 
 	_ = function //(w, r)
+}
+
+func getLock(path string) error {
+	i := 0
+	for _, ok := Info[path]; ok; i++ {
+		time.Sleep(5 * time.Millisecond)
+		// wait for 10 times and timeout if lock is not released
+		if i > 30 {
+			break
+		}
+	}
+	if i > 31 {
+		return errors.New("Unable to unlock")
+		// timeout with 504 and time taken to process the request
+		// and the value of the path
+	}
+	Locker.Lock()
+	// time.Sleep(500 * time.Millisecond) // test with this in case of doubt
+	Info[path] = time.Now()
+	Locker.Unlock()
+	return nil
+
+}
+func releaseLock(path string) error {
+	Locker.Lock()
+	delete(Info, path)
+	Locker.Unlock()
+	return nil
 }
 
 // Extract filename from header
@@ -244,9 +297,12 @@ func getSoftLinks(header http.Header) []string {
 	return strings.Split(header.Get(HeaderAlias), ",")
 }
 
-func isAppend(header http.Header) bool {
-	return strings.ToLower(header.Get(HeaderAppend)) == "true"
-
+func isAppend(header http.Header, settings *action.Settings) bool {
+	t := (strings.ToLower(header.Get(HeaderAppend)) == "true")
+	if t && settings.CompressionType == ff.CompressionNone && settings.ArchiveType == ff.ArchiveNone {
+		return true
+	}
+	return false
 }
 
 // TODO - change name to getDirectory from Path and add below changes
