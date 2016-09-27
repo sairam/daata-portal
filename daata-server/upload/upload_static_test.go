@@ -1,12 +1,12 @@
-package upload
+package upload_test
 
-import (
-	"testing"
-)
+// import (
+// 	"testing"
+// )
 
-func TestRedirect(t *testing.T) {
-	input := "A man, a plan, a canal: Panama"
-	if false {
-		t.Errorf(`IsPalindrome(%q) = false`, input)
-	}
-}
+// func TestStaticUpload(t *testing.T) {
+// 	input := "A man, a plan, a canal: Panama"
+// 	if true {
+// 		t.Errorf(`IsPalindrome(%q) = false`, input)
+// 	}
+// }

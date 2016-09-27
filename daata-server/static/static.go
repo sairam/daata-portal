@@ -10,8 +10,8 @@ import (
 	"../config"
 )
 
-// StaticWebsiteInfo is of type string with a URL / Contact / Website
-type StaticWebsiteInfo struct {
+// WebsiteInfo is of type string with a URL / Contact / Website
+type WebsiteInfo struct {
 	URL     string
 	Contact string
 	Website string
@@ -19,7 +19,7 @@ type StaticWebsiteInfo struct {
 
 // mapping "" to Helper probably maps to multiple urls including blank
 // we should avoid this and find a cleaner way to map the home page.
-var staticURLMappings = map[string]string{
+var urlMappings = map[string]string{
 	// "":        "usage", // index
 	"help":    "usage",
 	"about":   "about",
@@ -30,10 +30,10 @@ var staticURLMappings = map[string]string{
 }
 
 func page(name string, w io.Writer) {
-	filename := staticURLMappings[name]
+	filename := urlMappings[name]
 	if filename == "" {
 		fmt.Println("mapping did not match for " + name)
-		filename = staticURLMappings["help"]
+		filename = urlMappings["help"]
 	}
 	filename += ".tmpl"
 	fmt.Println(config.StaticDirectory + "tmpl/" + filename)
@@ -41,18 +41,18 @@ func page(name string, w io.Writer) {
 	if err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
-	t.Execute(w, StaticWebsiteInfo{URL: config.ServerURL})
+	t.Execute(w, WebsiteInfo{URL: config.ServerURL})
 }
 
-// StaticPage documentation
-func StaticPage(w http.ResponseWriter, r *http.Request) {
+// Page documentation
+func Page(w http.ResponseWriter, r *http.Request) {
 	path := "" + r.URL.Path
 	path = strings.TrimLeft(path, "/")
 	page(path, w)
 }
 
 func init() {
-	for path := range staticURLMappings {
-		http.HandleFunc("/"+path, StaticPage)
+	for path := range urlMappings {
+		http.HandleFunc("/"+path, Page)
 	}
 }

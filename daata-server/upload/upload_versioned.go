@@ -35,8 +35,8 @@ curl -X POST \
   use -F needn't set "Content-Type: multipart/form-data"
 */
 
-// UploadVersioned is
-func UploadVersioned(w http.ResponseWriter, r *http.Request) error {
+// Versioned is
+func Versioned(w http.ResponseWriter, r *http.Request) error {
 	return nil
 
 }

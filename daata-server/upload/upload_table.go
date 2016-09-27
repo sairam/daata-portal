@@ -2,8 +2,7 @@ package upload
 
 import "net/http"
 
-// UploadTable is
-func UploadTable(w http.ResponseWriter, r *http.Request) error {
+// Table is
+func Table(w http.ResponseWriter, r *http.Request) error {
 	return nil
-
 }

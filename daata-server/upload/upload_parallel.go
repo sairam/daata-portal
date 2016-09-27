@@ -2,8 +2,8 @@ package upload
 
 import "net/http"
 
-// UploadParallel is
-func UploadParallel(w http.ResponseWriter, r *http.Request) error {
+// Parallel is
+func Parallel(w http.ResponseWriter, r *http.Request) error {
 	return nil
 
 }
