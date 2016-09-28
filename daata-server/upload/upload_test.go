@@ -26,15 +26,15 @@ func TestStripPath(t *testing.T) {
 
 func TestExtBasedOnContentType(t *testing.T) {
 	type tester struct {
-		input    []string
+		input    string
 		expected string
 	}
 
 	tests := []tester{
-		tester{[]string{"application/json"}, "json"},
-		tester{[]string{"application/zip"}, "zip"},
-		tester{[]string{"text/html"}, "html"},
-		tester{[]string{"text/plain"}, "plain"},
+		tester{"application/json", "json"},
+		tester{"application/zip", "zip"},
+		tester{"text/html", "html"},
+		tester{"text/plain", "plain"},
 	}
 
 	for _, test := range tests {

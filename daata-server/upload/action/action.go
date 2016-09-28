@@ -55,6 +55,7 @@ func unarchive(settings *Settings, file, location string) (string, bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_ = out
 	// fmt.Printf("Output is \n%s\n", out)
 
 	// TODO - remove archived file

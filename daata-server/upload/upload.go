@@ -1,12 +1,15 @@
 package upload
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -39,13 +42,15 @@ const (
 	parallel                // per file
 )
 
+// HeaderVersion is ..
 const (
-	HeaderVersion     = "X-Version" // HeaderVersion info
-	HeaderAlias       = "X-Alias"
+	HeaderVersion     = "X-Version" // HeaderVersion is used for creating documentation
+	HeaderAlias       = "X-Alias"   // HeaderAlias used along side documentation for linking a version
 	HeaderUploadType  = "X-Upload-Type"
 	HeaderFileName    = "X-File-Name"
-	HeaderAppend      = "X-Append" // used for Parallel writes
+	HeaderAppend      = "X-Append" // used for Parallel/Concurrent writes
 	HeaderContentType = "Content-Type"
+	ResponseHeaderURL = "X-Generated-URL"
 )
 
 /*
@@ -74,19 +79,19 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	// Determine aliases types etc., Default is static.
 
 	function := unableToDetermine
-	switch strings.Join(r.Header[HeaderUploadType], "") {
-	case "static", "Static", "onetime", "OneTime":
+	switch strings.ToLower(r.Header.Get(HeaderUploadType)) {
+	case "static", "onetime":
 		function = Static // static files like zip or html without versioning (below code to SaveFile)
-	case "versioned_files", "VersionedFiles":
+	case "versioned_file", "versionedfile":
 		function = Versioned
-	case "data_point", "data_points", "dataPoint", "dataPoints":
+	case "data_point", "datapoint":
 		function = DataPoints // data points like key/value one or multiple
 		// data is usually appended to a file. like in parallel, but not necessarily large files
 		// does not support/expect zips
-	case "table", "Table":
+	case "table":
 		function = Table // json or CSV formats
 		// should get a single file
-	case "parallel", "Parallel":
+	case "parallel":
 		function = Parallel // multiple files to be put into the same location appended to each other
 		// This needs to be passed to the SaveToFile parameter with a lockfile or something equivalent
 		// only supports text files
@@ -94,27 +99,59 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 		function = StaticNoOverride // in case of an existing directory in the place, we will throw an error
 	}
 
-	// First. make a temporary location and save the file
-	// returns a temporary directory where you can move this and then move the files to new location
-	// tempDir, tempFile, err := utils.SaveToTempLocation(uploadLoc.path(), data)
+	var err error
+	var uploadLoc *uploadLocation
+	// read the data from the body based on type, save the file
+	bodyData, _ := ioutil.ReadAll(r.Body)
+	// utils.DebugHTTP(w, r)
+
+	if datapoint := checkDataPointType(r.Header.Get(HeaderContentType)); datapoint != DataPointNone {
+		dirName, ok := getFromPath(r.URL.Path)
+		if !ok {
+			dirName = dirName + httpPathSeparator + utils.RandomString(config.RandomStringLength)
+		}
+
+		dirName = convertPathToDirectory(dirName)
+		uploadLoc = &uploadLocation{dirName, "", []string{}, "", "datapoint"}
+
+		dir := utils.MoveToFromDir("")
+		os.Chdir(dir())
+		defer os.Chdir(dir())
+
+		uploadLoc.generateDirectory()
+
+		// currentTime := time.Now().Unix()
+
+		// This is a CSV
+		r := csv.NewReader(strings.NewReader(string(bodyData)))
+		records, err1 := r.ReadAll()
+		var graphData [100]float64
+
+		for i, record := range records {
+			if len(record) >= 3 {
+				filename := record[0]
+				uploadLoc.filename = filename
+				data := strings.Join(record[1:3], ",") + "\n"
+				graphData[i], _ = strconv.ParseFloat(record[1], 64)
+				utils.AppendToFile(uploadLoc.path(), []byte(data))
+			}
+		}
+		if err1 != nil {
+			log.Fatal(err1)
+		}
+		return
+	}
 
 	// Determine location to upload
-	uploadLoc := generateUploadLocation(r)
+	uploadLoc = generateUploadLocationForRawData(r)
 	compressionType, archiveType := getAction(uploadLoc.extension)
 
 	// move to directory and pop out
 	dir := utils.MoveToFromDir("")
-	// fmt.Println(os.Getwd())
 	os.Chdir(dir())
-	// fmt.Println(os.Getwd())
 	defer os.Chdir(dir())
 
-	// get main directory to save directory
 	uploadLoc.generateDirectory()
-
-	// read the data from the body based on type, save the file
-	data, _ := ioutil.ReadAll(r.Body)
-	// utils.DebugHTTP(w, r)
 	// fmt.Println(uploadLoc)
 
 	settings := &action.Settings{
@@ -125,18 +162,16 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 
 	settings.AppendMode = isAppend(r.Header, settings)
 
-	var err error
-
 	if settings.AppendMode {
 		err = getLock(uploadLoc.path())
 		if err != nil {
 			w.WriteHeader(http.StatusGatewayTimeout)
 			return
 		}
-		_, err = utils.AppendToFile(uploadLoc.path(), data)
+		_, err = utils.AppendToFile(uploadLoc.path(), bodyData)
 		releaseLock(uploadLoc.path())
 	} else {
-		_, err = utils.SaveToFile(uploadLoc.path(), data)
+		_, err = utils.SaveToFile(uploadLoc.path(), bodyData)
 	}
 
 	// save file in directory location
@@ -156,7 +191,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	os.Chdir(subdir())
 
 	targetURL := config.ServerURL + display.Prefix() + convertDirectoryToPath(uploadLoc.dirpath())
-	w.Header().Set("X-Generated-URL", targetURL)
+	w.Header().Set(ResponseHeaderURL, targetURL)
 
 	// fmt.Fprintf(w, "\n"+output+"\n")
 
@@ -244,23 +279,52 @@ func getExt(r *http.Request) (string, extFrom) {
 	if match != "" {
 		return match, extURLPath
 	}
-	return extBasedOnContentType(r.Header[HeaderContentType]), extContentType
+	return extBasedOnContentType(r.Header.Get(HeaderContentType)), extContentType
 }
 
-func extBasedOnContentType(contentType []string) string {
-	str := strings.Split(contentType[0], httpPathSeparator)[1]
-	if str == "x-www-form-urlencoded" {
-		return "txt"
+// DataPoint is one of these types
+// counting (incr/decr), value, gauges (can be increment from previous value), progress (means %)
+type DataPoint int
+
+// DataPointNone is None
+const (
+	DataPointNone = iota
+	DataPointCounter
+	DataPointValue
+	DataPointProgress
+)
+
+func checkDataPointType(contentType string) DataPoint {
+	str := strings.Split(contentType, httpPathSeparator)[1]
+	var output DataPoint = DataPointNone
+	switch str {
+	case "vnd.datapoint+counter":
+		output = DataPointCounter
+	case "vnd.datapoint+value":
+		output = DataPointValue
+	case "vnd.datapoint+percentage":
+		output = DataPointProgress
 	}
-	return str
+	return output
 }
 
-func generateUploadLocation(r *http.Request) *uploadLocation {
+func extBasedOnContentType(contentType string) string {
+	str := strings.Split(contentType, httpPathSeparator)[1]
+	output := str
+	switch str {
+	case "x-www-form-urlencoded":
+		output = "txt"
+	}
+	return output
+}
+
+func generateUploadLocationForRawData(r *http.Request) *uploadLocation {
 	/*
 	  1.1. Get path
 	  1.2. If path is not there, create a directory under level 2 like if uploaded to /u/docs, create /u/docs/{123456}/
 	  1.3. If path is not there, create a directory under level 1 like if uploaded to /u, create /u/{123456}/
 	*/
+
 	dirName, ok := getFromPath(r.URL.Path)
 	if !ok {
 		dirName = dirName + httpPathSeparator + utils.RandomString(config.RandomStringLength)
@@ -272,7 +336,6 @@ func generateUploadLocation(r *http.Request) *uploadLocation {
 
 	// Later - Need to fork off here based on form vs upload type
 	// If form data is submitted, we need to do action per file
-
 	ext, extfrom := getExt(r)
 	fileName, ext := getFilename(r, ext, extfrom)
 

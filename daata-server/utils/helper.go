@@ -5,11 +5,37 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 
 	"../config/"
 )
+
+const b62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+// copied example code from http://chartd.co/
+func EncodeGraphData(data []float64, min, max float64) string {
+	r := math.Dim(max, min)
+	bs := make([]byte, len(data))
+	if r == 0 {
+		for i := 0; i < len(data); i++ {
+			bs[i] = b62[0]
+		}
+		return string(bs)
+	}
+	enclen := float64(len(b62) - 1)
+	for i, y := range data {
+		index := int(enclen * (y - min) / r)
+		if index >= 0 && index < len(b62) {
+			bs[i] = b62[index]
+		} else {
+			bs[i] = b62[0]
+		}
+	}
+	return string(bs)
+
+}
 
 // MoveToFromDir ..
 // generates a function which returns target dir and then current dir

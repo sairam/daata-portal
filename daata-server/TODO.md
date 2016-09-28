@@ -16,15 +16,16 @@
 ### Upload documentation / Release Notes
 1. Create a permalink with name "Spokes Platform" (Note: A zip or gz or bz2 file is sent, we automatically de-compress it)
 1. Headers are sent as versions as array
-  curl -X POST -H 'Version: "2.1.3"' -H 'Alias: ["release-20160707", "master", "stable"]' -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' --file-binary="@filename.zip" -H 'Content-Type: application/zip' https://my.daata.xyz/docs/spokes-platform
-1. Main page of https://my.daata.xyz/docs/project-name will contain all the list of recently uploaded data
+  `curl -D - -X POST -H "X-Version: 0.10" -H "X-Alias: master,default" -H "Content-Type: application/zip" --data-binary "@data.zip" localhost:8001/u/snapdeal/mvp/`
+  `curl -X POST -H 'X-Version: 2.1.3' -H 'X-Alias: release-20160707,master,stable' -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' --file-binary="@filename.zip" -H 'Content-Type: application/zip' https://my.daata.xyz/docs/spokes-platform`
+1. Main page of https://my.daata.xyz/docs/project-name will contain all the list of recently uploaded data (index page)
 1. Triggers webhook for actions
 
 ### Code Coverage
 1. Create a 'Data Point' project (enable History) with name "Spokes Platform" under Code Coverage (code-coverage)
 1. Create data point name as "coverage" and select "number". (Use this template and modify the name)
 1. Headers are sent as versions as array
-  curl -X POST -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' -H 'Content-Type: application/json' --data="{coverage: "89.9"}" https://my.daata.xyz/code-coverage/spokes-platform
+  curl -X POST -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' -H 'Content-Type: application/vnd.datapoint' --data="coverage,89.9,time" https://my.daata.xyz/code-coverage/spokes-platform
 1. If additional data points check is not present, extra data will be ignored.
 
 ### Data/Information from database/url through a Cron/Deployment Status
@@ -49,6 +50,7 @@
 1. If its under a project name, file(s) are just pushed into the master. No versioning allowed like docs
 1. Multiple files can be added to the directory and files are overridden. All names should be uniq or will be made uniq if conflicts occur.
 1. Multiple files sending the same filename will be appended with "/a" flag to avoid overriding
+1. `curl -D - -X POST -H "X-Append: true" -H "X-File-Name: index.txt" --data-binary "@index.txt" localhost:8001/u/example/sample/`
 1. Your standard S3 file with an append mode on locks which will be merged as soon as file uploads start/end !!!!!! what?
 1. Use the UI to uniq/sort/filter/append/prepend data on the processed file using Javascript
 
@@ -107,3 +109,14 @@
 * Revision history for overriding values (as a pro feature)
 * For hosting repos/data, look at gogs UI(MIT)
 * Hooks/Webhooks can be created to trigger website updates
+
+
+## TODO
+### Upload
+1. Access restriction to write/read
+1. If unzip file does not contain index.html, generate one with the tree (already being done when displaying the directory)
+1. Paginate if there are too many files/directories
+1. Generate template with bootstrap
+1. Streaming can be a Enterprise feature since it requires authentication to encrypt traffic
+1. Graphs - line, column, area, bar, table, json -- options to group by (keen.io)
+1. Graphs - add timeframe - relative/ absolute with TZ (keen.io)

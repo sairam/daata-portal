@@ -42,6 +42,9 @@ func (u *uploadLocation) path() string {
 }
 
 func (u *uploadLocation) filepath() string {
+	if u.filename == "" {
+		return ""
+	}
 	return u.filename + "." + u.extension
 }
 

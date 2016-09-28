@@ -1,0 +1,53 @@
+<html>
+<body>
+<div style="height: 600px; width: 1200px">
+<canvas id="chart"></canvas>
+</div>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+
+<script type="text/javascript">
+
+var lineData = [{{range .Data}}{{ . }},{{end}}];
+var labels = [{{range .Labels}}{{ . }},{{end}}];
+var title = {{.Title}};
+var data = {
+  labels: labels,
+  datasets: [{
+    label: title,
+    fill: false,
+    lineTension: 0.3,
+    backgroundColor: "rgba(75,192,192,0.4)",
+    borderColor: "rgba(75,192,192,1)",
+    borderCapStyle: 'butt',
+    borderDash: [],
+    borderDashOffset: 3.0,
+    borderJoinStyle: 'miter',
+    pointBorderColor: "rgba(75,192,192,1)",
+    pointBackgroundColor: "#fff",
+    pointBorderWidth: 1,
+    pointHoverRadius: 7,
+    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+    pointHoverBorderColor: "rgba(220,220,220,1)",
+    pointHoverBorderWidth: 2,
+    pointRadius: 5,
+    pointHitRadius: 10,
+    data: lineData,
+    spanGaps: false,
+  }]
+};
+
+var ctx = document.getElementById("chart").getContext("2d");
+
+var options = {}
+
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: options
+});
+
+
+</script>
+</body>
+</html>
