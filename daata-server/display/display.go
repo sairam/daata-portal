@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
+	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -29,19 +31,25 @@ type ChartjsLineGraph struct {
 	Data   []string
 	Labels []string
 	Title  string
+	Name   string
 }
 
 // DisplayGraph ..
-func DisplayGraph(w http.ResponseWriter, r *http.Request) {
-	filename := config.DataDirectory + "code-coverage/mycode/coverage.datapoint"
+func DisplayGraph(w http.ResponseWriter, r *http.Request, filename string) {
+	// fmt.Println(filename)
+	pathSplit := strings.Split(filename, string(os.PathSeparator))
+	name := pathSplit[len(pathSplit)-1]
+
+	// filename := config.DataDirectory + "code-coverage/mycode/coverage.datapoint"
 	bytes, _ := ioutil.ReadFile(filename)
 
 	params := map[string]string{}
-	for _, dint := range strings.Split(r.URL.RawQuery, "&") {
-		str := strings.Split(dint, "=")
-		i, j := str[0], str[1]
-		params[i] = j
-	}
+	// TODO - fails when no RawQuery is sent
+	// for _, dint := range strings.Split(r.URL.RawQuery, "&") {
+	// 	str := strings.Split(dint, "=")
+	// 	i, j := str[0], str[1]
+	// 	params[i] = j
+	// }
 	noOfEntries := float64(30)
 	if count, ok := params["count"]; ok {
 		t, ok := strconv.ParseFloat(count, 64)
@@ -67,7 +75,7 @@ func DisplayGraph(w http.ResponseWriter, r *http.Request) {
 			_ = parsedDate
 		}
 	}
-	generateChartjsGraph(w, graphData, graphLabel)
+	generateChartjsGraph(w, graphData, graphLabel, name)
 	return
 }
 
@@ -81,7 +89,7 @@ func DisplayGraph(w http.ResponseWriter, r *http.Request) {
 
 // <img src="/a.svg?w=580&h=180&d0=SRWfaZHLHEDABKKTUYgpqqvws0138eZfaYtwxxsxyst">
 
-func generateChartjsGraph(w http.ResponseWriter, graphData, graphLabel []string) {
+func generateChartjsGraph(w http.ResponseWriter, graphData, graphLabel []string, name string) {
 	templatefile := "line_graph_chartjs.tmpl"
 	t, err := template.New(templatefile).ParseFiles(config.DisplayDirectory + "tmpl/" + templatefile)
 	if err != nil {
@@ -90,24 +98,62 @@ func generateChartjsGraph(w http.ResponseWriter, graphData, graphLabel []string)
 	t.Execute(w, ChartjsLineGraph{
 		Data:   graphData,
 		Labels: graphLabel,
-		Title:  "coverage",
+		Title:  name,
+		Name:   name,
 	})
 }
 
+var dataPointRegexp = regexp.MustCompile(`\.datapoint$`)
+
 func openDir(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/d/test" {
-		DisplayGraph(w, r)
-		return
+	p := strings.TrimPrefix(r.URL.Path, DisplayPrefix)
+	r.URL.Path = p
+	regularFlow := false
+
+	f := strings.Join([]string{config.DataDirectory, r.URL.Path}, string(os.PathSeparator))
+
+	stat, err := os.Stat(f)
+	// no such directory/file exists
+	if err != nil {
+		fmt.Println("is not a file/directory")
+		stat, err = os.Stat(f + ".datapoint")
+		if err == nil {
+			f += ".datapoint"
+			fmt.Println("is a datapoint file")
+		}
 	}
-	// fmt.Println(r.URL.Path)
-	if p := strings.TrimPrefix(r.URL.Path, DisplayPrefix); len(p) < len(r.URL.Path) {
-		r.URL.Path = p
+
+	if err == nil {
+		if stat.IsDir() {
+			// is a dir
+			var files []string
+			listFiles, _ := ioutil.ReadDir(f)
+			for _, file := range listFiles {
+				if dataPointRegexp.MatchString(file.Name()) {
+					files = append(files, file.Name())
+				}
+			}
+			for _, file := range files {
+				DisplayGraph(w, r, f+"/"+file)
+			}
+			if len(files) == 0 {
+				regularFlow = true
+			}
+		} else {
+			if dataPointRegexp.MatchString(f) {
+				DisplayGraph(w, r, f)
+			} else {
+				regularFlow = true
+			}
+			// is a file is not a dir
+			// display the data points
+		}
+	}
+	// fmt.Println(regularFlow)
+	if regularFlow {
 		// check auth here
 		// TODO - fix directory here from config
 		http.FileServer(http.Dir(config.DataDirectory)).ServeHTTP(w, r)
-	} else {
-		// fmt.Println(p)
-		http.NotFound(w, r)
 	}
 }
 

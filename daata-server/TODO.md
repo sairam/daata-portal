@@ -1,7 +1,7 @@
 ## Start Coding HERE in this order and `write tests`
 1. Create new (upload) entities to store information
 1. Unzip / Host files at location based on url endpoint and version
-1. Store data points in a file by time
+1. Store data points in a file at a time
 1. Make a graph with data points
 1. Append to file based on name (per directory from multiple hosts)
 1. Create / Edit (`txt`/`md`) files (<10KB) and save back from UI

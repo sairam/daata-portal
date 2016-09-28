@@ -1,7 +1,6 @@
-<html>
-<body>
-<div style="height: 600px; width: 1200px">
-<canvas id="chart"></canvas>
+
+<div style="height: 400px; width: 800px; display: inline-block">
+<canvas id="chart{{.Name}}"></canvas>
 </div>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
@@ -37,7 +36,7 @@ var data = {
   }]
 };
 
-var ctx = document.getElementById("chart").getContext("2d");
+var ctx = document.getElementById("chart{{.Name}}").getContext("2d");
 
 var options = {}
 
@@ -49,5 +48,3 @@ var myLineChart = new Chart(ctx, {
 
 
 </script>
-</body>
-</html>
