@@ -87,6 +87,8 @@ func openDir(w http.ResponseWriter, r *http.Request) {
 func config(str string) string {
 	if str == "directory" {
 		return conf.C().Upload.Directory
+	} else if str == "display" {
+		return conf.C().Directories.Display
 	}
 	return ""
 }

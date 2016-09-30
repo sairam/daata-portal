@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	conf "./config"
@@ -10,6 +11,8 @@ import (
 	_ "./static"
 	_ "./upload"
 	// _ "./utils"
+
+	_ "net/http/pprof"
 )
 
 // This is to be used in all upload forms
@@ -25,5 +28,5 @@ func main() {
 	//  /u/ - upload
 	//  /r/ - redirects
 
-	http.ListenAndServe(":"+port, nil)
+	log.Println(http.ListenAndServe(":"+port, nil))
 }

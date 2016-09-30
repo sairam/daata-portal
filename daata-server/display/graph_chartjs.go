@@ -91,7 +91,7 @@ func Graph(w http.ResponseWriter, r *http.Request, filename string) {
 
 func generateChartjsGraph(w http.ResponseWriter, linegraph *ChartjsLineGraph) {
 	templatefile := "line_graph_chartjs.tmpl"
-	t, err := template.New(templatefile).ParseFiles(config("directory") + "tmpl/" + templatefile)
+	t, err := template.New(templatefile).ParseFiles(config("display") + "tmpl/" + templatefile)
 	if err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
