@@ -1,0 +1,23 @@
+[server]
+port = 8001
+url = "https://22e46773.ap.ngrok.io"
+
+[upload]
+size_limit = 5000 # form size and every other
+# directories should end with a /
+directory = "/Users/ram/src/mvp/daata-go/data/"
+
+directory_length = 6
+
+[upload_permissions]
+directory = 700 # convert to octal
+file = 600
+
+[directories]
+# directories should end with a /
+static = "/Users/ram/src/mvp/daata-go/daata-server/static/"
+display = "/Users/ram/src/mvp/daata-go/daata-server/display/"
+
+[redirect]
+length = 6
+prefix = "/r"

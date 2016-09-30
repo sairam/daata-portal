@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"../config"
+	conf "../config"
 )
 
 // WebsiteInfo is of type string with a URL / Contact / Website
@@ -36,12 +36,12 @@ func page(name string, w io.Writer) {
 		filename = urlMappings["help"]
 	}
 	filename += ".tmpl"
-	fmt.Println(config.StaticDirectory + "tmpl/" + filename)
-	t, err := template.New(filename).ParseFiles(config.StaticDirectory + "tmpl/" + filename)
+	// fmt.Println(config.StaticDirectory + "tmpl/" + filename)
+	t, err := template.New(filename).ParseFiles(conf.C().Directories.Static + "tmpl/" + filename)
 	if err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
-	t.Execute(w, WebsiteInfo{URL: config.ServerURL})
+	t.Execute(w, WebsiteInfo{URL: conf.C().Server.URL})
 }
 
 // Page documentation

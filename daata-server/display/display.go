@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"../config"
+	conf "../config"
 )
 
 /*
@@ -29,7 +29,7 @@ func isDataPoint(str string) bool {
 
 func renderIfDataPoint(p string) ([]string, bool) {
 	regularFlow := false
-	f := strings.Join([]string{config.DataDirectory, p}, string(os.PathSeparator))
+	f := config("directory") + p
 	var files []string
 
 	stat, err := os.Stat(f)
@@ -80,8 +80,15 @@ func openDir(w http.ResponseWriter, r *http.Request) {
 	if regularFlow {
 		// check auth here
 		// TODO - fix directory here from config
-		http.FileServer(http.Dir(config.DataDirectory)).ServeHTTP(w, r)
+		http.FileServer(http.Dir(config("directory"))).ServeHTTP(w, r)
 	}
+}
+
+func config(str string) string {
+	if str == "directory" {
+		return conf.C().Upload.Directory
+	}
+	return ""
 }
 
 // Prefix specifies the download/display location of a file

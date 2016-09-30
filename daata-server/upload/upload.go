@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"../config"
+	conf "../config"
 	"../display"
 	"../utils"
 	"./action"
@@ -108,7 +108,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	if datapoint := checkDataPointType(r.Header.Get(HeaderContentType)); datapoint != DataPointNone {
 		dirName, ok := getFromPath(r.URL.Path)
 		if !ok {
-			dirName = dirName + httpPathSeparator + utils.RandomString(config.RandomStringLength)
+			dirName = dirName + httpPathSeparator + utils.RandomString(conf.C().Upload.DirectoryLength)
 		}
 
 		dirName = convertPathToDirectory(dirName)
@@ -190,7 +190,7 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	uploadLoc.makeAliases()
 	os.Chdir(subdir())
 
-	targetURL := config.ServerURL + display.Prefix() + convertDirectoryToPath(uploadLoc.dirpath())
+	targetURL := conf.C().Server.URL + display.Prefix() + convertDirectoryToPath(uploadLoc.dirpath())
 	w.Header().Set(ResponseHeaderURL, targetURL)
 
 	// fmt.Fprintf(w, "\n"+output+"\n")
@@ -327,7 +327,7 @@ func generateUploadLocationForRawData(r *http.Request) *uploadLocation {
 
 	dirName, ok := getFromPath(r.URL.Path)
 	if !ok {
-		dirName = dirName + httpPathSeparator + utils.RandomString(config.RandomStringLength)
+		dirName = dirName + httpPathSeparator + utils.RandomString(conf.C().Upload.DirectoryLength)
 	}
 
 	dirName = convertPathToDirectory(dirName)

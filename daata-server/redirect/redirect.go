@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"../config/"
+	conf "../config/"
 	"../utils/"
 )
 
@@ -237,7 +237,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		// err := r.ParseForm()
-		err := r.ParseMultipartForm(config.MaxUploadParamsLimit)
+		err := r.ParseMultipartForm(int64(conf.C().Upload.SizeLimit))
 		if err != nil {
 			// TODO - generate form based on Content-Type
 			// application/x-www-form-urlencoded

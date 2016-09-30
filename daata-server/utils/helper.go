@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	"../config/"
+	conf "../config/"
 )
 
 const b62 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -39,10 +39,11 @@ func EncodeGraphData(data []float64, min, max float64) string {
 
 // MoveToFromDir ..
 // generates a function which returns target dir and then current dir
+// TODO Deprecate this or pass the dataDir
 func MoveToFromDir(str string) func() string {
 	i := 0
 	pwd, _ := os.Getwd()
-	dataDir := config.DataDirectory + "/" + str
+	dataDir := conf.C().Upload.Directory + "/" + str
 	return func() string {
 		if i == 0 {
 			i++

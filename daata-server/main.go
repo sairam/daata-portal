@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"./config"
+	conf "./config"
 	_ "./display"
 	_ "./redirect"
 	_ "./static"
 	_ "./upload"
-	_ "./utils"
+	// _ "./utils"
 )
 
 // This is to be used in all upload forms
 
 func main() {
-	fmt.Printf("Server is being served on http://localhost%s\n", config.Port)
+	port := fmt.Sprintf("%d", conf.C().Server.Port)
+	fmt.Printf("Server is being served on http://localhost:%s\n", port)
 
 	//  / - index
 	//  /help - help
@@ -24,5 +25,5 @@ func main() {
 	//  /u/ - upload
 	//  /r/ - redirects
 
-	http.ListenAndServe(config.Port, nil)
+	http.ListenAndServe(":"+port, nil)
 }
