@@ -264,7 +264,7 @@ const (
 )
 
 func isWhiteListedRegexp(str string) string {
-	var extRegexp = regexp.MustCompile(`(tar\.gz|tar.bz2|gz|zip|bz2|txt|html|json|log)$`)
+	var extRegexp = regexp.MustCompile(`(tar\.gz|tar.bz2|gz|zip|bz2|txt|html|json|log|png|jpe?g|bmp|svg|webp|xls)$`)
 	var match = extRegexp.FindStringSubmatch(str)
 	if len(match) > 0 {
 		return match[0]
