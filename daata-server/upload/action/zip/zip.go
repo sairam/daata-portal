@@ -26,8 +26,29 @@ func Extract(file, location string) ([]byte, error) {
 	fmt.Println(os.Getwd())
 	cmd := []string{"/usr/bin/unzip", file, "-d", location}
 	fmt.Println(cmd)
-	return exec.Command(cmd[0], cmd[1:]...).Output()
+
+	// Display everything we got if error.
+	output, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
+	if err != nil {
+		fmt.Println("Error when running command.  Output:")
+		fmt.Println(string(output))
+		fmt.Printf("Got command status: %s\n", err.Error())
+	}
+	return output, err
+	// return exec.Command(cmd[0], cmd[1:]...).Output()
 }
+
+// // Display just the stderr if an error occurs
+// cmd := exec.Command(...)
+// stderr := &bytes.Buffer{}    // make sure to import bytes
+// cmd.Stderr = stderr
+// err := cmd.Run()
+// if err != nil {
+//     fmt.Println("Error when running command.  Error log:")
+//     fmt.Println(stderr.String())
+//     fmt.Printf("Got command status: %s\n", err.Error())
+//     return
+// }
 
 // List the files in the zip
 func List(file string) ([]byte, error) {

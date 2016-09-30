@@ -1,10 +1,90 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  rel="stylesheet" />
+<link href="//fonts.googleapis.com/css?family=Cousine|Raleway:500" rel="stylesheet">
 
+<style>
+body {
+  font-family: 'Raleway', sans-serif;
+  margin: 2em;
+  font-size: 1.6em;
+  line-height: 2em;
+}
+pre {
+  font-family: 'Cousine', monospace;
+  font-size: 1em;
+  line-height: 2em;
+}
+</style>
+<body>
+  <div >
+  <h1>Usage Guide for Daata (in alpha) <a href="https://daata.bitgeek.in/">[Permalink]</a></h1>
+  <p class="bg-danger" style="padding: 15px;">
+    Note: DO NOT upload any private data. This is a ephimeral(temporary) server(for now) and data can be deleted any time. All data is public.<br />
+  </p>
+  <p class="bg-success" style="padding: 15px;">
+    Send any feedback/feature requests/company hosting/dev pain points etc., or  like/love/hate about this to my email <a href="mailto:sairam.kunala@gmail.com">sairam.kunala AT gmail</a> or <a href="https://twitter.com/sairam" target="_blank">hail me on Twitter</a>
+  </p>
+<h3>Upload zipped content containing html or other files</h3>
+<p>Only 1 file can be uploaded at a time. This is your typical dropbox/s3 uploads. <br />There is some magic involved, We decompress and unarchive the files uploaded</p>
 <pre>
-curl -i -X POST {{.URL}}/upload -H "Content-Type: application/zip" --data-binary "@data.zip"
-curl -i -X POST {{.URL}}/upload -H "Content-Type: application/json" --data-binary "@freshmenu.json"
-
-Examples:
-{{.URL}}/d/wwpbbi
-{{.URL}}/d/iwhspu
-
+curl -D - -X POST -H "Content-Type: application/zip" --data-binary "@data.zip" {{.URL}}/u/static/files/
+curl -D - -X POST -H "Content-Type: application/json" --data-binary "@freshmenu.json" {{.URL}}/u/static/dir/oldmenu.json
+curl -D - -X POST -H "X-File-Name: help.html" --data-binary "@help.html" {{.URL}}/u/test/help/
 </pre>
+<p>
+  Uploads/Overrides existing to <a target="_blank" href="{{.URL}}/d/test/help/help.html">help.html</a>
+  <br />
+  If filename is not provided or content-type is not whitelisted, assumes .txt
+</p>
+
+<hr />
+
+<h3>Upload zipped content in versions and create versions and link to latest aliases</h3>
+<p>Useful when uploading documentation from your build/CI system</p>
+<pre>
+curl -D - -X POST -H "X-Version: 0.10" -H "X-Alias: master,default" -H "Content-Type: application/zip" --data-binary "@data.zip" {{.URL}}/u/your/mvp/
+</pre>
+<p>You can find your documentation at <a href="{{.URL}}/d/your/mvp/master/" target="_blank">{{.URL}}/d/your/mvp/master/</a></p>
+<hr />
+
+<h3>Send files from multiple hosts to append with each other</h3>
+<p>When querying for logs/static data and needs to be passed merged. Can be run on all hosts in parallel</p>
+<pre>
+curl -D - -X POST -H "X-Append: true" -H "X-File-Name: index.txt" --data-binary "@index.txt" {{.URL}}/u/company/logfile/
+</pre>
+<hr />
+
+<h3>Send metrics to be plotted with the time</h3>
+<p>Metrics </p>
+<pre>
+curl -D - -X POST -H 'Content-Type: application/vnd.datapoint+value' --data "twitter-stream,78,`date +%s`" {{.URL}}/u/code-coverage/mycode/
+</pre>
+<p>
+  Open <a href="{{.URL}}/d/code-coverage/mycode/twitter-stream" target="_blank">{{.URL}}/d/code-coverage/mycode/twitter-stream</a> to see last few entries.<br />
+  All entries from the directory can be found at <a href="{{.URL}}/d/code-coverage/mycode/" target="_blank">{{.URL}}/d/code-coverage/mycode/</a>
+</p>
+<iframe src="/d/code-coverage/mycode/twitter-stream?h=150&amp;w=300" style="border: 0px" ></iframe>
+<hr/>
+
+
+<h3>Create simple redirects</h3>
+<p>
+  This is your typical bitly/is.gd/goo.gl/tinyurl without the analytics <br>
+  Any link shortening without a short_url will generate a short_url provided in the response
+</p>
+<pre>
+curl -D - -X POST -H "Content-Type: multipart/form-data" -F "short_url=gogle" -F "long_url=https://www.google.com" -F "override=true" {{.URL}}/r/
+</pre>
+<p>
+  Now open <a href="{{.URL}}/r/gogle" target="_blank">{{.URL}}/r/gogle</a> to redirect your users<br/>
+  Add a + at the end to see where you want the redirect to like <a href="{{.URL}}/r/gogle+" target="_blank">{{.URL}}/r/gogle+</a>
+</p>
+<hr/>
+
+<h3></h3>
+<p></p>
+<pre>
+</pre>
+<hr/>
+
+</div>
+</body>

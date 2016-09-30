@@ -16,6 +16,9 @@ import (
 )
 
 type ChartjsLineGraph struct {
+	Height int
+	Width  int
+
 	Data   []string
 	Labels []string
 	Title  string
@@ -29,13 +32,27 @@ func Graph(w http.ResponseWriter, r *http.Request, filename string) {
 	name := pathSplit[len(pathSplit)-1]
 	bytes, _ := ioutil.ReadFile(filename)
 
-	params := map[string]string{}
-	// TODO - fails when no RawQuery is sent
-	// for _, dint := range strings.Split(r.URL.RawQuery, "&") {
-	// 	str := strings.Split(dint, "=")
-	// 	i, j := str[0], str[1]
-	// 	params[i] = j
-	// }
+	params := make(map[string]string)
+	if r.URL.RawQuery != "" {
+		// TODO - fails when no RawQuery is sent
+		// fmt.Println(r.URL.RawQuery)
+		for _, dint := range strings.Split(r.URL.RawQuery, "&") {
+			str := strings.Split(dint, "=")
+			i, j := str[0], str[1]
+			params[i] = j
+		}
+	}
+	height := 400
+	width := 800
+	if params["h"] != "" {
+		height, _ = strconv.Atoi(params["h"])
+		height -= 20
+	}
+	if params["w"] != "" {
+		width, _ = strconv.Atoi(params["w"])
+		width -= 20
+	}
+
 	noOfEntries := float64(30)
 	if count, ok := params["count"]; ok {
 		t, ok := strconv.ParseFloat(count, 64)
@@ -61,20 +78,23 @@ func Graph(w http.ResponseWriter, r *http.Request, filename string) {
 			_ = parsedDate
 		}
 	}
-	generateChartjsGraph(w, graphData, graphLabel, name)
+	linegraph := &ChartjsLineGraph{
+		Data:   graphData,
+		Labels: graphLabel,
+		Title:  name,
+		Name:   name,
+		Height: height,
+		Width:  width,
+	}
+	generateChartjsGraph(w, linegraph)
 	return
 }
 
-func generateChartjsGraph(w http.ResponseWriter, graphData, graphLabel []string, name string) {
+func generateChartjsGraph(w http.ResponseWriter, linegraph *ChartjsLineGraph) {
 	templatefile := "line_graph_chartjs.tmpl"
 	t, err := template.New(templatefile).ParseFiles(config.DisplayDirectory + "tmpl/" + templatefile)
 	if err != nil {
 		fmt.Fprintf(w, "%s", err)
 	}
-	t.Execute(w, ChartjsLineGraph{
-		Data:   graphData,
-		Labels: graphLabel,
-		Title:  name,
-		Name:   name,
-	})
+	t.Execute(w, linegraph)
 }

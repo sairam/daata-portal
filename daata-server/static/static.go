@@ -48,6 +48,7 @@ func page(name string, w io.Writer) {
 func Page(w http.ResponseWriter, r *http.Request) {
 	path := "" + r.URL.Path
 	path = strings.TrimLeft(path, "/")
+	w.Header().Set("Content-Type", "text/html;utf8")
 	page(path, w)
 }
 

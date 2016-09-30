@@ -2,19 +2,35 @@ package redirect_test
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"testing"
 )
 
 const host = "http://localhost:8001/"
 const redirectURL = "r/"
 
-func init() {
+func TestMain(m *testing.M) {
+	fmt.Println("------------")
+	// defer cleanup()
+	// TODO setup config
+	os.Exit(m.Run())
 
+}
+
+func TestSubmitActualForm(t *testing.T) {
+	// req := httptest.NewRequest("POST", "http://example.com/foo", nil)
+	// add headers
+
+	// w := httptest.NewRecorder()
+	// Redirect(w, req)
+	//
+	// fmt.Printf("%d - %s", w.Code, w.Body.String())
 }
 
 func submitForm(url string, kv url.Values, file string) (response *http.Response, err error) {
