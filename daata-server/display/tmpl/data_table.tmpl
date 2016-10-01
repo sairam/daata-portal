@@ -1,0 +1,53 @@
+<style>
+table {
+  font: 1em sans-serif;
+  border: solid 1px;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+table thead th, tfoot th {
+    border: solid 1px;
+    padding: 1em;
+    text-align: center;
+}
+table tbody td {
+    border: solid 1px;
+    padding: 0.66em;
+}
+
+/*TODO integrate responsive table - https://jsfiddle.net/ryanoc/Vb99a/ */
+
+</style>
+
+<table id="{{.Name}}">
+  <thead>
+      <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Office</th>
+          <th>Age</th>
+          <th>Start date</th>
+          <th>Salary</th>
+      </tr>
+  </thead>
+  <tfoot>
+      <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Office</th>
+          <th>Age</th>
+          <th>Start date</th>
+          <th>Salary</th>
+      </tr>
+  </tfoot>
+  <tbody>
+      <tr>
+          <td>Tiger Nixon</td>
+          <td>System Architect</td>
+          <td>Edinburgh</td>
+          <td>61</td>
+          <td>2011/04/25</td>
+          <td>$320,800</td>
+      </tr>
+  </tbody>
+</table>

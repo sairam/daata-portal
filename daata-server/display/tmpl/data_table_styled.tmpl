@@ -1,0 +1,49 @@
+<!-- source: https://datatables.net/examples/styling/bootstrap.html -->
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css"  rel="stylesheet" />
+<div class="container">
+
+<table id="{{.Name}}" class="table table-striped styled table-bordered" cellspacing="0" width="100%">
+  <thead>
+      <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Office</th>
+          <th>Age</th>
+          <th>Start date</th>
+          <th>Salary</th>
+      </tr>
+  </thead>
+  <tfoot>
+      <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Office</th>
+          <th>Age</th>
+          <th>Start date</th>
+          <th>Salary</th>
+      </tr>
+  </tfoot>
+  <tbody>
+      <tr>
+          <td>Tiger Nixon</td>
+          <td>System Architect</td>
+          <td>Edinburgh</td>
+          <td>61</td>
+          <td>2011/04/25</td>
+          <td>$320,800</td>
+      </tr>
+  </tbody>
+</table>
+
+</div>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.12.3.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('table.styled').DataTable();
+} );
+</script>

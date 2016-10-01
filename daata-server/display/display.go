@@ -1,6 +1,8 @@
 package display
 
 import (
+	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -67,6 +69,21 @@ func renderIfDataPoint(p string) ([]string, bool) {
 }
 
 func openDir(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/d/test" {
+		w.Header().Set("Content-Type", "text/html;utf8")
+		templatefile := "data_table.tmpl" // data_table_styled.tmpl
+		t, err := template.New(templatefile).ParseFiles(config("display") + "tmpl/" + templatefile)
+		if err != nil {
+			fmt.Fprintf(w, "%s", err)
+		}
+		t.Execute(w, struct {
+			Name string
+		}{
+			Name: "testing",
+		})
+		return
+	}
+
 	p := strings.TrimPrefix(r.URL.Path, DisplayPrefix)
 	r.URL.Path = p
 	files, regularFlow := renderIfDataPoint(p)

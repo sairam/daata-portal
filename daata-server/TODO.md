@@ -1,13 +1,17 @@
-## Start Coding HERE in this order and `write tests`
-1. Create new (upload) entities to store information
-1. Unzip / Host files at location based on url endpoint and version
-1. Store data points in a file at a time
-1. Make a graph with data points
-1. Append to file based on name (per directory from multiple hosts)
-1. Create / Edit (`txt`/`md`) files (<10KB) and save back from UI
+## Start Coding HERE in this order and *`write tests`*
+1. <s>Create new (upload) entities to store information</s>
+1. <s>Unzip / Host files at location based on url endpoint and version
+1. <s>Store data points in a file at a time
+1. <s>Make a graph with data points
+1. <s>Append to file based on name (per directory from multiple hosts)
+1. <s>Help Page
+1. Save table data from mysql output and display as HTML tables
+1. Create / Edit (`txt`/`md`/`log`) files (<10KB) and save feature from UI
 1. UI features for `grep`, `split`, `prepend`, `append`, `clean` data etc.,
-1. Create one Organisation and User entity
-1. User Auth with `Google`/`Github` Auth Login only
+1. Work on the UI client in parallel
+1. Demo this to companies in Bangalore to gather feedback on developer pain points
+1. Brainstorm about entities to add for making this public/company only
+1. User Authentication with `Google`/`Github` - Auth Login only
 1. Authorization token by user for all entities
 1. Public website and Dashboard development in parallel
 1. Webhooks
@@ -30,10 +34,10 @@
 
 ### Data/Information from database/url through a Cron/Deployment Status
 1. Create a 'Data Point' project with name "Shipments Delivered" under Ekart (ekart)
-1. Allow any data to be sent. Useful when new keys come in or structure is not well defined (Billing should be based on no. of data points - like stathat.com)
-1. Data is sent as file with json content (as data points)
+1. Allow any data to be sent. Useful when new keys come in or structure is not well defined
+1. Data is sent as file with json content (as table)
   curl -X POST -H 'Authorization: "abcdefghijklmnopqrstuvwxyz"' -H 'Content-Type: application/json' --data="@file.json" https://my.daata.xyz/ekart/shipments-delivered
-1. Visualization on Table based on type of Hash sent !!!! this is not clear
+1. Visualization on Table (with may be a sort by column feature (minimal))
 1. (Will require versions or latest information in case of delays in publishing or backfilling)
 
 ### Data Points by Host
@@ -56,13 +60,13 @@
 
 ### Create snippets
 1. Create snippets with a markdown/WSIWYG editor and link snippets etc.,
-1. Embed graphs or dashboards !!!!
+1. Embed graphs or dashboards via image tags or UI to add them. (requires auto complete based on type- datapoint/graph vs table vs external image vs iframe)
 1. Publish as a page with information so that you can showcase tech metrics of your company to the rest of the world!
-1. Send Daily snapshots of dashboards to your customers/stakeholders
+1. Send Daily snapshots of dashboards to your customers/stakeholders on email via triggers
 
 ### Creating a Dashboard
 1. 'New Dashboard'
-1. 'New Graph' or 'New Data Point' or 'New Text' (from local data or remote data API like Graphite or Graphana (client side))
+1. 'New Graph' or 'New Data Point' or 'New Text' (from local data or remote data API like Graphite or Graphana (client side)
 1. Select from the UI to make a graph with the data point using auto complete and time range.
 1. Resize/Move the widgets to arrange on the screen resolution.
 1. A text widget has header, text from the data point.
@@ -73,6 +77,7 @@
 * www.daata.xyz will contain the static website  (see if you can generate with hugo with a theme?)
 * /blog/...
 * /about
+* /help
 * /usage
 * /use-cases/ - another blog / detail with data like how ifttt does with recipes
 * /how-it-is-being-used/ - testimonials from customers
@@ -83,12 +88,12 @@
 
 ## Types of URLs
 1. Company accounts - has subdomain like google.daata.xyz/repo/url
-1. Personal accounts - at my.daata.xyz/repo/data.txt
+1. Personal accounts - at my.daata.xyz/repo/data.txt ????
 1. Repositories are usernames at my.daata.xyz. anyone can create a new data point. The owners are defined based on the repo.
 
-1. /temp/ is a different repo based on files which go away in few hours/days
-1. /a/ or /data is a permanent default url.
+1. /t/ is a temporary data endpoint which does not have the path. we generate the path for them but is limited to 1 day (wont be done for MVP)
 1. /r/ for redirects
+1. /s/ is reserved for system or vendor related endpoints. cannot be used to upload any data. Example: bootstrap css/js etc.,
 
 ## AuthS & AuthZ
 1. Auth S is based on domain and you can whitelist users by domain and add others and ensure they have Authorization per project/endpoint.
@@ -102,21 +107,20 @@
 
 ## By User
 * Everyone will login through subdomain.daata.xyz/auth or my.daata.xyz/auth. If a domain is authenticated
-* Every user in every organisation has an account. Data can never move across organisations.
+* Every user in every organization has an account. Data can never move across organizations.
 * An employee is part of multiple teams/projects and a Company has many teams
 * This is required for authorization by project/team for sensitive information
-* Freeze / Snapshot capability
+* Freeze / Snapshot capability for a directory / file (as a pro feature)
 * Revision history for overriding values (as a pro feature)
-* For hosting repos/data, look at gogs UI(MIT)
+* For hosting repos/data or displaying directories, look at gogs UI(MIT)
 * Hooks/Webhooks can be created to trigger website updates
 
-
-## TODO
-### Upload
-1. Access restriction to write/read
-1. If unzip file does not contain index.html, generate one with the tree (already being done when displaying the directory)
-1. Paginate if there are too many files/directories
-1. Generate template with bootstrap
-1. Streaming can be a Enterprise feature since it requires authentication to encrypt traffic
+## TODO - Not in scope of MVP
+1. Access restriction to write/read by resource
+1. If unzip file does not contain index.html, generate one with the tree (already being done when displaying the directory). nice to have in general. Fancy Bootstrap UI would be nice to have generated based on settings. Also, this can be the location to manage subdirectories if not auto generated.
+1. Also, paginate if there are too many files/directories
+1. Streaming can be a Enterprise feature since it requires authentication to encrypt traffic for SSE.
 1. Graphs - line, column, area, bar, table, json -- options to group by (keen.io)
 1. Graphs - add timeframe - relative/ absolute with TZ (keen.io)
+1. (Billing should be based on no. of data points - like stathat.com)
+1. Drag/Drop grids in UI - https://github.com/troolee/gridstack.js | https://github.com/hootsuite/grid | https://github.com/ducksboard/gridster.js

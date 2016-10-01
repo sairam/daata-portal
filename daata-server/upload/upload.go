@@ -264,7 +264,7 @@ const (
 )
 
 func isWhiteListedRegexp(str string) string {
-	var extRegexp = regexp.MustCompile(`(tar\.gz|tar.bz2|gz|zip|bz2|txt|html|json|log|png|jpe?g|bmp|svg|webp|xls)$`)
+	var extRegexp = regexp.MustCompile(`(tar\.gz|tar\.bz2|gz|zip|bz2|txt|html|json|log|png|jpe?g|bmp|svg|webp|md|markdown|toml|cfg|xml|xls)$`)
 	var match = extRegexp.FindStringSubmatch(str)
 	if len(match) > 0 {
 		return match[0]
@@ -298,10 +298,14 @@ func checkDataPointType(contentType string) DataPoint {
 	str := strings.Split(contentType, httpPathSeparator)[1]
 	var output DataPoint = DataPointNone
 	switch str {
+	// counter means we want to group by second/minute/hour
 	case "vnd.datapoint+counter":
 		output = DataPointCounter
+		// value means we want to show it as is
 	case "vnd.datapoint+value":
 		output = DataPointValue
+		// progress/percent may mean it wont be more than 100
+		// TODO - percentage looks unnecessary. we can fit it in value itself
 	case "vnd.datapoint+percentage":
 		output = DataPointProgress
 	}
