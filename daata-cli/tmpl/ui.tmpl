@@ -10,10 +10,11 @@ body {
 }
 
 .fancyDiv {
-  transform: rotate(-180deg);
+  transform: scale(0);
   height: 0px;
   overflow: hidden;
   opacity: 0;
+  position: relative;
 
   /*transition-property: height, opacity, transform;
   transition-duration: 0.25s, 0.25s, 0.25s;
@@ -21,22 +22,22 @@ body {
   transition-delay: 0s, 0s, 0;*/
   /*
   */
-  transform-origin: 0% 0% 0;
-  transform-style: flat;
+  transform-origin: 50% 0% 0;
 
   transition: transform .5s ease-in-out, opacity .05s linear .45s, height .25s ease-out .25s;
   transition-delay: 0s;
 }
 
 .fancyHide {
-  transform: rotate(180deg);
+  position: absolute;
+  transform: scale(0.5);
   height: inherit;
-  opacity: 1;
+  opacity: 0.25;
 }
 
 .fancyShow {
   /*transition-delay: 0s;*/
-  transform: rotate(0deg);
+  transform: scale(1);
   height: inherit;
   opacity: 1;
 }
