@@ -10,26 +10,33 @@ body {
 }
 
 .fancyDiv {
-  transform: scale(0);
-  height: 0;
+  transform: rotate(-180deg);
+  height: 0px;
   overflow: hidden;
   opacity: 0;
 
-  transition-property: height, opacity, transform;
-  transition-duration: 0s, 0s, 0s;
+  /*transition-property: height, opacity, transform;
+  transition-duration: 0.25s, 0.25s, 0.25s;
   transition-timing-function: ease-in-out,ease-in-out, cubic-bezier(.42, 0, .58, 1);
-  transition-delay: 0s, 0s, 0;
+  transition-delay: 0s, 0s, 0;*/
+  /*
+  */
+  transform-origin: 0% 0% 0;
+  transform-style: flat;
 
+  transition: transform .5s ease-in-out, opacity .05s linear .45s, height .25s ease-out .25s;
+  transition-delay: 0s;
 }
 
-/*.fancyHide {
-  transform: scale(0);
-  height: 1px;
-  opacity: 0;
-}*/
+.fancyHide {
+  transform: rotate(180deg);
+  height: inherit;
+  opacity: 1;
+}
 
 .fancyShow {
-  transform: scale(1);
+  /*transition-delay: 0s;*/
+  transform: rotate(0deg);
   height: inherit;
   opacity: 1;
 }
@@ -95,19 +102,22 @@ changeForm = function() {
   var uiCmd = document.getElementById('uiCommand');
   var uiScript = document.getElementById('uiScript');
   if (FormState) {
-    // addClass(uiCmd, 'fancyHide')
-    removeClass(uiCmd, 'fancyShow')
-
-    // removeClass(uiScript, 'fancyHide')
-    addClass(uiScript, 'fancyShow')
+    // we are going to hide uiCmd
+    // and show uiScript
+    yaction(uiCmd, uiScript)
   } else {
-    removeClass(uiScript, 'fancyShow')
-    // addClass(uiScript, 'fancyHide')
-
-    // removeClass(uiCmd, 'fancyHide')
-    addClass(uiCmd, 'fancyShow')
+    yaction(uiScript, uiCmd)
   }
   FormState = !FormState;
+}
+
+yaction = function(el1, el2) {
+  addClass(el1, 'fancyHide');
+  addClass(el2, 'fancyShow');
+  removeClass(el1, 'fancyShow')
+  window.setTimeout(function(el){
+    removeClass(el, 'fancyHide');
+  }, 500, el1)
 }
 
 addClass = function(el, klass) {
