@@ -12,34 +12,24 @@ body {
 .fancyDiv {
   transform: scale(0);
   height: 0px;
+  display: none;
   overflow: hidden;
   opacity: 0;
-  position: relative;
 
-  /*transition-property: height, opacity, transform;
-  transition-duration: 0.25s, 0.25s, 0.25s;
-  transition-timing-function: ease-in-out,ease-in-out, cubic-bezier(.42, 0, .58, 1);
-  transition-delay: 0s, 0s, 0;*/
-  /*
-  */
-  transform-origin: 50% 0% 0;
-
-  transition: transform .5s ease-in-out, opacity .05s linear .45s, height .25s ease-out .25s;
-  transition-delay: 0s;
 }
-
-.fancyHide {
-  position: absolute;
-  transform: scale(0.5);
-  height: inherit;
-  opacity: 0.25;
-}
-
 .fancyShow {
-  /*transition-delay: 0s;*/
   transform: scale(1);
   height: inherit;
+  display: block;
+  overflow: inherit;
   opacity: 1;
+}
+
+.copyBtn {
+  position: absolute;
+  top: 0em;
+  right: 1em;
+  border-radius: 1.66em;
 }
 
 input.input-xlg, button.btn-xlg, select.input-xlg {
@@ -67,13 +57,29 @@ kbd.current {
 
 </style>
 <body>
-
-<button id="btn" onclick="changeForm()" style="position: absolute; left: 50%; top: 0">+</button>
+<div class="container-fluid">
 
 <div class="row">
+<button class="btn btn-success" onclick="return false;">Hosts</button>
+<button class="btn btn-success" onclick="return false;">Clusters</button>
+<!-- <button class="btn btn-success" onclick="return false;">Host Groups</button> -->
+<button class="btn btn-danger" onclick="return false;">Enter Passphrase: _</button>
+&nbsp;&nbsp;&nbsp;
+<button class="btn btn-info" onclick="return false;">Favourites</button>
+<button class="btn btn-info" onclick="return false;">Setup Tunnels</button>
+&nbsp;&nbsp;&nbsp;
+<button class="btn btn-danger" onclick="return false;">Set Cloud Providers/Containers</button>
+&nbsp;&nbsp;&nbsp;
+<button class="btn btn-success" onclick="return false;">Send Output to Server</button>
+<button class="btn btn-success" onclick="return false;">Download output</button>
+<!-- <button class="btn btn-success" onclick="return false;">Import Output</button> -->
+</div>
 
+<br />
+
+<div class="row">
 <form method="post" id="uiScript" class="fancyDiv">
-  <textarea name="script" rows="8" class="col-md-12 input-xlg" placeholder="#!/bin/bash
+  <textarea name="script" rows="8" class="form-inline col-md-8 input-xlg" placeholder="#!/bin/bash
 cd /tmp/
 seq 1 10 |tee output.txt
 cat output.txt | grep 1
@@ -88,14 +94,19 @@ cat output.txt | grep 1
   <select class="form-inline input-xlg col-md-2"><option value="all">All Hosts</option><option value="host1">Host1</option></select>
   <button type="button" class="btn btn-primary btn-xlg col-md-2">Run It!</button>
 </form>
-
 </div>
 
 <br />
+<div class="row">
+  <button class="btn btn-info" onclick="changeForm()">/</button>
+
 {{ $outputDivSize := 4}}
 <input type="number" class="form-inline input-sm" id="outputDivSize" min="2" max="12" value="{{ $outputDivSize }}" onchange="changeOutputDivSize()" >
 <kbd class="current">{{.Current}}</kbd>
 {{ range $str := .History }}<kbd class="history" style="order:1">{{ $str }}</kbd> {{end}}
+
+</div>
+
 <script>
 
 var FormState = true;
@@ -113,12 +124,8 @@ changeForm = function() {
 }
 
 yaction = function(el1, el2) {
-  addClass(el1, 'fancyHide');
   addClass(el2, 'fancyShow');
   removeClass(el1, 'fancyShow')
-  window.setTimeout(function(el){
-    removeClass(el, 'fancyHide');
-  }, 500, el1)
 }
 
 addClass = function(el, klass) {
@@ -155,10 +162,11 @@ changeOutputDivSize = function() {
 <div class="row js-OutputDivSize">
   {{ range .Details }}
   <div class="col-md-{{$outputDivSize}}">
-    <code>{{ .Host }}</code>:<kbd>{{ .Input }}</kbd>
+    <button class="btn btn-default copyBtn">Copy</button><code>{{ .Host }}</code>:<kbd>{{ .Input }}</kbd>
     <pre>{{ .Output }}</pre>
   </div>
   {{ end }}
 </div>
 <hr/>
+</div>
 </body>
