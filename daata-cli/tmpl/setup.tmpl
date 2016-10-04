@@ -1,0 +1,49 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"  rel="stylesheet" />
+<link href="//fonts.googleapis.com/css?family=Cousine" rel="stylesheet">
+<style>
+body {
+  margin: 2em;
+  font-family: 'Cousine', monospace;
+  font-size: 1.6em;
+  line-height: 2em;
+}
+</style>
+
+<body>
+<div class="container-fluid">
+
+  <div id="configuration">
+  <div id="singleHost">
+    <h4>Add Key+PassPhrase/Password</h4>
+    <form>
+      <input type="text" class="form-inline input-xl col-md-4" name="name"     value="" placeholder="Key Name" />
+      <input type="text" class="form-inline input-xl col-md-4" name="key" value="" placeholder="key/id_rsa.pub" />
+      <input type="password" class="form-inline input-xl col-md-4" name="password" value=""/>
+    </form>
+  </div>
+  <h4>Add Host</h4>
+  <form>
+    <input type="text" class="form-inline input-xl col-md-4" name="name"     value="" placeholder="Name of the Connection" />
+    <input type="text" class="form-inline input-xl col-md-4" name="hostname" value="" placeholder="example.com" />
+    <input type="text" class="form-inline input-xl col-md-4" name="username" value="" placeholder="alice" />
+    <select class="form-inline input-xl col-md-4" name="privateKey"><option>.ssh/id_rsa</option><option>.ssh/id_dsa</option><option>.ssh/amazon.pem</option></select>
+    <input type="password" class="form-inline input-xl col-md-4" name="passphrase" value="" />
+  </form>
+  </div>
+
+  <div id="multipleHosts">
+  <h4>Add Host(s)</h4>
+  <form>
+    <input type="text" class="form-inline input-xl col-md-4" name="name"     value="" placeholder="Name of the Connection" />
+    <input type="text" class="form-inline input-xl col-md-4" name="hostname" value="" placeholder="example.com" />
+    <input type="text" class="form-inline input-xl col-md-4" name="username" value="" placeholder="alice" />
+    <textarea class="form-inline input-xl col-md-4" name="hosts" value="" placeholder="alice" />
+    <select class="form-inline input-xl col-md-4" name="authType"><option>Key based</option><option>Password</option></select>
+    <select class="form-inline input-xl col-md-4" name="privateKey"><option>.ssh/id_rsa</option><option>.ssh/id_dsa</option><option>.ssh/amazon.pem</option></select>
+    <input type="password" class="form-inline input-xl col-md-4" name="passphrase" value="" />
+  </form>
+  </div>
+</div>
+
+</div>
+</body>

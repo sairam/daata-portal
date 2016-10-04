@@ -1,6 +1,6 @@
 [server]
 port = 8001
-url = "https://22e46773.ap.ngrok.io"
+url = "https://ca2134bd.ap.ngrok.io"
 
 [upload]
 size_limit = 5000 # form size and every other

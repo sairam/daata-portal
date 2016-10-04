@@ -3,11 +3,18 @@
 <style>
 body {
   margin: 2em;
-
   font-family: 'Cousine', monospace;
   font-size: 1.6em;
   line-height: 2em;
 }
+
+.copyBtn {
+  position: absolute;
+  top: 0em;
+  right: 1em;
+  border-radius: 1.66em;
+}
+
 
 .fancyDiv {
   transform: scale(0);
@@ -23,13 +30,6 @@ body {
   display: block;
   overflow: inherit;
   opacity: 1;
-}
-
-.copyBtn {
-  position: absolute;
-  top: 0em;
-  right: 1em;
-  border-radius: 1.66em;
 }
 
 input.input-xlg, button.btn-xlg, select.input-xlg {
@@ -54,8 +54,8 @@ kbd.history {
 kbd.current {
   background-color: green;
 }
-
 </style>
+
 <body>
 <div class="container-fluid">
 
@@ -89,6 +89,7 @@ cat output.txt | grep 1
 </form>
   <!-- <select class="form-inline input-xlg col-md-4">Select Script Template</select> -->
 
+<!-- <textarea>Send this file/upload to all hosts</textarea> -->
 <form method="post" id="uiCommand" class="fancyShow fancyDiv">
   <input type="text" name="command" class="form-inline input-xlg col-md-8" value="" placeholder="cat filename.txt" />
   <select class="form-inline input-xlg col-md-2"><option value="all">All Hosts</option><option value="host1">Host1</option></select>
