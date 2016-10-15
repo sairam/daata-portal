@@ -5,33 +5,45 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Daata | Solving Developer Pain Points one at a time</title>
+
 <style>
 body {
-  font-family: 'Roboto', sans-serif;
+  /*font-family: 'Roboto', sans-serif;
   margin: 2em;
   font-size: 2em;
+  line-height: 2em;*/
+}
+pre {
+  font-family: 'Cousine', monospace;
+  font-size: 1em;
   line-height: 2em;
+}
+
+#clone-banner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  border: 0;
+}
+
+/* for index.html */
+body {
+  margin: 0;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
 }
 
 section#heading  {order: 0}
-section#vision   {order: 1}
+section#tldr     {order: 1}
 section#solved   {order: 2}
+section#demo     {order: 3}
+section#subscribe{order: 4}
+section#who      {order: 5}
+section#origin   {order: 6}
 section#tosolve  {order: 7}
-section#who      {order: 6}
-section#demo     {order: 4}
-section#origin   {order: 5}
-section#subscribe{order: 3}
 section#footer   {order: 100}
 
-
-pre {
-  font-family: 'Cousine', monospace;
-  font-size: 1em;
-  line-height: 2em;
-}
 #subscribe, .center {
   display: flex;
  flex-direction: row;
@@ -45,19 +57,15 @@ pre {
 }
 
 #solved li:before {
-  /*Using a Bootstrap glyphicon as the bullet point*/
   content: "\e067";
   font-family: 'Glyphicons Halflings';
-  /*font-size: 9px;*/
   float: left;
   padding-right: 0.66em;
   color: #44c500;
 }
 #tosolve li::before {
-  /*Using a Bootstrap glyphicon as the bullet point*/
   content: "\e157";
   font-family: 'Glyphicons Halflings';
-  /*font-size: 9px;*/
   float: left;
   padding-right: 0.66em;
   color: #c54400;
@@ -68,43 +76,105 @@ pre {
   background-color: #eee;
   color: #337ab7;
 }
+
+#floating-menu {
+  position: fixed;
+  top: 35%;
+  left: 0;
+  background-color: white;
+  border: 1px black dashed;
+  padding: 1em 1em 1em 0em;
+  font-size: 0.9em;
+  line-height: 1.5em;
+}
+#floating-menu li {
+  display: block;
+}
+#floating-menu li::before {
+  content: "\e006";
+  font-family: 'Glyphicons Halflings';
+  font-size: 14px;
+  padding-bottom: 2px;
+  padding-right: 5px;
+}
+#floating-menu li:hover::before {
+  color: #c54400;
+}
+#tldr .row > div {
+  border: 1px dashed #337ab7;
+  min-height: 10em;
+}
+#tldr .row > div p {
+  /*font-size: 0.8em;*/
+  /*line-height: 1.1em;*/
+}
 </style>
 
 <body class="container-fluid">
-<section id="heading" class="row">
-  <h1 class="text-center">Daata <!--strike>Side</strike-->Project</h1>
-</section>
 
-<section id="vision" class="row">
+<section id="heading" class="row">
   <a name="vision"></a>
   <div class="col-md-offset-2 col-md-8 col-sm-12">
-  <h2 class="text-center">Project's Vision is to <u>Solve</u> repeating developer painpoints</h2>
+  <h1 class="text-center">the <u>Daata</u> project</h1>
+  <article class="text-center">Our <u>Vision</u> is to <u>Solve</u> for Developer pain points as well as empower small teams with business solutions</article>
+  <hr/>
+</section>
+
+<section id="tldr" class="row">
+  <div class="col-md-offset-2 col-md-8 col-sm-12">
+    <div class="row">
+      <div class="col-md-4 col-sm-6">
+        <h4>Solve Pain Points</h4>
+        <p>Proxy/Replay staging requests for debugging issues in your REST HTTP endpoints</p>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4>Solve Documentation/Misc data problems</h4>
+        <p>Host data, documentation from a single server or multiple servers to visualize graphs</p>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4>Generate Graphs</h4>
+        <p>Make Graphs from uploaded data</p>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4>Generate Dashboards</h4>
+        <p>Generate configurable dashboards from your uploaded data and host in on your TVs</p>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4>Secure! For Your Eyes only!</h4>
+        <p>Host it on your own infrastructure and intranet or the internet with https and secure credentials</p>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <h4>Open Source &amp; Free</h4>
+        <p>Made with Go. All the code is open source and open for pull requests</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="solved" class="row">
   <a name="solved"></a>
   <div class="col-md-offset-2 col-md-8 col-sm-12">
-  <h2 class="text-center">Pain Points Solved</h2>
-  <hr />
+  <h3 class="text-left">Pain Points Solved</h3>
   <ul>
   <li><u><a href="/how-to/versioned-documentation.html">Versioned Documentation</a></u> by Project for teams inside/across companies. <a href="/use-cases/better-documentation.html">(Google Docs just wont cut it)</a></li>
   <li>Inspire your team by displaying <u><a href="/how-to/data-points.html">Code Coverage</a></u> on your Status Screen</li>
   <li><a href="/how-to/static-files.html">Reviewing designs/HTML files</a> prototypes made. <a href="/use-cases/static-webpage.html">When you need to showcase to your co-worker</a></li>
   <li><a href="/how-to/fetch-from-database.html">Fetching information from database</a> and <a href="/use-cases/orders-total-today.html">portray your daily revenue realtime</a></li>
   <li>Make Dashboards from Code Coverage or Order Totals generated earlier <a href="/use-cases/quick-dashboards.html">to make insightful graphs</a></li>
-  <li><a href="/how-to/url-shortner.html">Wishing to have a bitly/shortners</a>aka shortcuts for quick links inside (without the need of analytics)</li>
+  <li><a href="/how-to/url-shortner.html">URL Shortners to easily share/shout/remember URLs</a> for <a href="/use-cases/short-urls.html">sending reports</a></li>
   <li><a href="/how-to/send-data.html">The Pastebin you always wanted</a></li>
-  <li><a href="/how-to/append-data.html">Fetch data from 10+ servers</a> and <a href="/use-cases/multi-host-processing.html">process the data into information</a></li>
-  <li><a href="/how-to/send-json-on-rest.html">Seeing that SMS/Text/Email on the browser</a> instead of <a href="/use-cases/mock-services-for-staging.html">paying for the price to production APIs</a></li>
-  <li>This is <u>That Miscellaneous</u> service which your DevOps never wants to manage</li>
+  <li><a href="/how-to/append-data.html">Fetch data from 10+ servers</a> and <a href="/use-cases/multi-host-processing.html">process into information</a></li>
+  <li><a href="/how-to/send-json-on-rest.html">Visualize a non-production API call/webhook(Example: Email/SMS) on the browser</a> instead of <a href="/use-cases/mock-services-for-staging.html">paying for the price to production APIs</a></li>
+  <li>This is <u>One Miscellaneous server</u> your <a href="/how-to/server-management.html">DevOps would love to manage</a>.</li>
   </ul>
 
-  <h3 class="text-center">Daata is made by developers and we know the pain points. Hence, we have</h3>
+  <br/>
+  <h3 class="text-left">Daata is made by developers and we know the pain points. Hence, we have</h3>
   <ul>
-    <li>ZERO library dependencies during installation. Just a single binary to be mixed with a config file and let the magic run</li>
-    <li>Works on almost any platform</li>
+    <li>ZERO dependencies for installation. Just add salt to your binary and let the magic run</li>
+    <li>code works on any platform</li>
     <li>Simple backup and restores</li>
-    <li>Host inside your cloud without any restrictions</li>
+    <li>Host inside your cloud/VPN/intranet/laptop</li>
   </ul>
 
 </div>
@@ -114,8 +184,8 @@ pre {
 <a name="tosolve"></a>
 <div class="col-md-offset-2 col-md-8 col-sm-12">
   <h2 class="text-center">Solutions In Progress</h2>
-  <h3>We have a plan to work on these. <a href="https://github.com/sairam/daata/issues/new">Let us know if you want us to solve your usecase</a></h3>
   <hr />
+  <h3>We have a plan to work on the following. <a href="https://github.com/sairam/daata/issues/new">Let us know if you want us to solve your usecase</a></h3>
 <ul>
   <li><a href="/use-cases/debugging-http-requests.html">Debugging HTTP/REST calls across services on staging/development</a></li>
   <li><a href="/use-cases/proxying-http-requests.html">Proxying / Debugging requests</a></li>
@@ -166,11 +236,44 @@ pre {
 </div>
 </section>
 
+<section id="demo" class="row">
+  TODO - add a screencast so that Demo can be linked to
+  <h2 class="text-center">Demo</h2>
+  <a name="demo"></a>
+  <div class="col-md-offset-2 col-md-8 col-sm-12">
+    Sample Demo
+<pre>
+  echo "Current Date Time is `date`" | curl -X POST https://demo.daata.in/192_168_0_1/hello/
+</pre>
+
+Now open <a target="_blank" href="https://demo.daata.in/192_168_0_1/hello/">https://demo.daata.in/192_168_0_1/hello/</a>
+
+<a href="/demo.html"><h2 class="text-center">Checkout more detailed Demos</h2></a>
+</div>
+</section>
+
+<div class="row hidden-sm" id="floating-menu">
+<ul>
+  <li><a href="#vision">Vision</a></li>
+  <li><a href="#solved">Solved PainPoints</a></li>
+  <li><a href="#tosolve">Solutions <sub>In Progress</sub></a></li>
+  <li><a href="/demo.html">Demo</a> | <a href="/how-to/">Usage</a></li>
+  <!-- <li><a href="https://daata.xyz/?utm_source=daata.in&utm_intent=Hosted">Hosted Solution</a></li> -->
+  <li><a href="/use-cases/">All Use Cases</a></li>
+  <li><a href="https://github.com/sairam/daata/">Source Code</a></li>
+  <li><a href="/faq.html">FAQ</a> || <a href="https://github.com/sairam/daata/issues/new" target="_blank">Ask</a></li>
+  <li><a href="/setup">Lets Set It Up</a></li>
+  <li><a href="#subscribe">Subscribe</a></li>
+</ul>
+</div>
+
+
+<!-- Common Footer -->
 <section class="row well" id="subscribe">
   <a name="subscribe"></a>
   <div class="col-md-8 col-sm-12">
     <h2 class="text-center"><span class="glyphicon glyphicon-bullhorn" style="color: #000" aria-hidden="true">&nbsp;</span>Subscribe here to get news updates</h2>
-    <h3 class="text-right">Or <a href="/feed">Use the <span class="glyphicon glyphicon-link" aria-hidden="true"></span>Feed</a></h3>
+    <!-- <h3 class="text-right">Or <a href="/feed">Use the <span class="glyphicon glyphicon-link" aria-hidden="true"></span>Feed</a></h3> -->
     <form class="form-horizontal" action="https://tinyletter.com/daata" method="post" target="popupwindow" onsubmit="window.open('https://tinyletter.com/daata', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true">
       <div class="form-group">
         <label class="col-md-3 col-sm-12" for="tlemail">Enter your email address</label>
@@ -188,54 +291,21 @@ pre {
     </form>
   </div>
 </section>
-
-<section id="demo" class="row">
-  TODO - add a screencast so that Demo can be linked to
-  <h2 class="text-center">Demo</h2>
-  <a name="demo"></a>
-  <div class="col-md-offset-2 col-md-8 col-sm-12">
-    Sample Demo
-<pre>
-  echo "Current Date Time is `date`" | curl -X POST https://demo.daata.in/192_168_0_1/hello/
-</pre>
-
-Now open <a target="_blank" href="https://demo.daata.in/192_168_0_1/hello/">https://demo.daata.in/192_168_0_1/hello/</a>
-
-<a href="/demo.html"><h2 class="text-center">Checkout more detailed Demos</h2></a>
-</div>
-</section>
-
-<div class="row hidden-sm" style="position: fixed; top: 40%; left: 0; background-color: white; border: 1px black dashed; padding: 1em 1em 1em 0em; font-size: 0.9em; line-height: 1.5em;">
-<!-- <a class="visible-sm">Visible SM</a> -->
-<ul>
-  <li><a href="#vision">Vision</a></li>
-  <li><a href="#solved">Solved PainPoints</a></li>
-  <li><a href="#tosolve">Solutions <sub>In Progress</sub></a></li>
-  <li><a href="/demo.html">Demo</a> | <a href="/usage">Usage</a></li>
-  <!-- <li><a href="https://daata.xyz/?utm_source=daata.in&utm_intent=Hosted">Hosted Solution</a></li> -->
-  <li><a href="/use-cases/">All Use Cases</a></li>
-  <li><a href="https://github.com/sairam/daata/">Source Code</a></li>
-  <li><a href="/rtfm.html">FAQ</a> || <a href="https://github.com/sairam/daata/issues/new" target="_blank">Ask</a></li>
-  <li><a href="#subscribe">Subscribe</a></li>
-</ul>
-</div>
-
-<div style="position: fixed; top: 0; right: 0; border: 0;">
+<div id="clone-banner">
 <a href="https://github.com/sairam/daata" rel="nofollow author" title="Daata on Git">
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" fill="#151513" style="position: absolute; top: 0; right: 0">
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" fill="#151513">
   <path d="M0 0l115 115h15l12 27 108 108V0z" fill="#fff"/>
-  <path class="octo-arm" d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16" style="-webkit-transform-origin: 130px 106px; transform-origin: 130px 106px"/>
+  <path class="octo-arm" d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16" style="transform-origin: 130px 106px"/>
   <path class="octo-body" d="M115 115s4 2 5 0l14-14c3-2 6-3 8-3-8-11-15-24 2-41 5-5 10-7 16-7 1-2 3-7 12-11 0 0 5 3 7 16 4 2 8 5 12 9s7 8 9 12c14 3 17 7 17 7-4 8-9 11-11 11 0 6-2 11-7 16-16 16-30 10-41 2 0 3-1 7-5 11l-12 11c-1 1 1 5 1 5z"/>
 </svg>
 </a>
 </div>
-<!-- <a href="https://github.com/sairam/daata"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork Daata on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a> -->
-
 
 <section id="footer" class ="row">
-<footer style="text-align: center">
+<footer class="text-center">
 <hr />
-&copy; 2016 <a href="https://github.com/sairam">@sairam</a>
+Made with <span class="glyphicon glyphicon-heart" style="color: red" aria-hidden="true"></span> with <a href="https://golang.org">Go</a><br/>
+&copy; <a href="https://sair.am/">Sairam</a> 2016
 </footer>
 </section>
 
