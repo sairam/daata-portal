@@ -9,7 +9,6 @@
 <style>
 body {
   /*font-family: 'Roboto', sans-serif;
-  margin: 2em;
   font-size: 2em;
   line-height: 2em;*/
 }
@@ -122,9 +121,13 @@ section#footer   {order: 100}
   color: black;
   font-family: 'Cousine', monospace;
 }
-h2 a.alternate {
+h2 .alternate {
   font-size: 0.7em;
   font-weight: normal;
+}
+h1 sub.alternate, h1 sup.alternate {
+  font-size: 0.7em;
+  font-weight: lighter;
 }
 </style>
 
@@ -132,7 +135,7 @@ h2 a.alternate {
 <section id="heading" class="row">
   <a name="vision"></a>
   <div class="col-md-offset-2 col-md-8 col-sm-12">
-  <h1 class="text-center">the <u>Daata</u> project</h1>
+  <h1 class="text-center"><sub class="alternate">the</sub> <u>Daata</u> <sup class="alternate">project</sup></h1>
   <article class="text-center">Our <u>Vision</u> is to <u>Solve</u> Developer pain points as well as to <u>Empower</u> small teams with business solutions</article>
   <hr/>
 </section>
@@ -144,18 +147,19 @@ h2 a.alternate {
     <div class="row">
       <div class="col-md-4 col-sm-6">
         <h4>Solves Dev Pain Points</h4>
-        <p>Proxy/Replay HTTP requests for identifying/modifying data in your service-to-service calls on Development or Staging environments</p>
+        <p>Proxy/Replay HTTP requests for modifying from your service-to-service calls on Development or Staging environments</p>
       </div>
       <div class="col-md-4 col-sm-6">
-        <h4>Solves "Where do I host this data" Problems</h4>
-        <p>Transfer data securely from any your machines to Daata server to analyise/edit/format/display data or graphs</p>
+        <h4>Solves "Where Do I Host?" Problems</h4>
+        <p>Transfer data securely from any number of machines to Daata server to analyse/modify/sort data</p>
       </div>
       <div class="col-md-4 col-sm-6">
-        <h4>Automagically generate Graphs from Data Points</h4>
+        <h4>Automagically Generate Graphs</h4>
         <p>Generate Graphs from data that is uploaded periodically to find trends.</p>
       </div>
       <div class="col-md-4 col-sm-6">
-        <h4>Drag/Drop Metrics into (1080p ready) Dashboards</h4>
+        <h4>Drag/Drop Metrics Into Dashboards</h4>
+        <h5>(1080p ready)</h5>
         <p>Drag/Drop graphs into dashboards and just type in a URL into your TVs to host get live data</p>
       </div>
       <div class="col-md-4 col-sm-6">
@@ -163,8 +167,8 @@ h2 a.alternate {
         <p>Host it on your own infrastructure and intranet or the internet with https and secure credentials</p>
       </div>
       <div class="col-md-4 col-sm-6">
-        <h4>Open Source &amp; Free</h4>
-        <p>Made with Go. All the code is open source and open for pull requests</p>
+        <h4>Open Source</h4>
+        <p>Made in Go. All the code is open source and open for development</p>
       </div>
     </div>
   </div>
