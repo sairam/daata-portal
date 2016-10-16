@@ -37,9 +37,9 @@ body {
 section#heading  {order: 0}
 section#demo     {order: 1}
 section#tldr     {order: 2}
-section#solved   {order: 3}
+section#who      {order: 3}
 section#subscribe{order: 4}
-section#who      {order: 5}
+section#solved   {order: 5}
 section#origin   {order: 6}
 section#tosolve  {order: 7}
 section#footer   {order: 100}
@@ -108,6 +108,8 @@ section#footer   {order: 100}
 #tldr .row > div {
   text-align: center;
   flex: 1 1 auto;
+  padding: 1.66em;
+  background-color: white;
   border: 1px dashed #337ab7;
   /*height: 12rem;*/
   /*overflow: scroll;*/
@@ -115,6 +117,14 @@ section#footer   {order: 100}
 #tldr .row > div p {
   /*font-size: 0.8em;*/
   /*line-height: 1.1em;*/
+}
+.well p {
+  color: black;
+  font-family: 'Cousine', monospace;
+}
+h2 a.alternate {
+  font-size: 0.7em;
+  font-weight: normal;
 }
 </style>
 
@@ -127,8 +137,10 @@ section#footer   {order: 100}
   <hr/>
 </section>
 
-<section id="tldr" class="row">
+<section id="tldr" class="row well">
   <div class="col-md-offset-2 col-md-8 col-sm-12">
+    <h2 class="text-center">What does Daata solve?</h2>
+    <hr>
     <div class="row">
       <div class="col-md-4 col-sm-6">
         <h4>Solves Dev Pain Points</h4>
@@ -216,7 +228,7 @@ section#footer   {order: 100}
 </section>
 
 <section class="row well center" id="origin">
-  <div class="col-md-8 col-sm-12">
+  <div class="col-md-8 col-sm-12" style="background-color: white">
   <h2 class="text-center">Origins/Status of Daata</h2>
   <hr />
 
@@ -245,21 +257,13 @@ section#footer   {order: 100}
 
 <section id="demo" class="row">
 <div class="col-md-offset-2 col-md-8 col-sm-12">
-<ul class="nav nav-pills">
-  <li role="presentation" class="active"><a href="#demo">Demo</a></li>
-  <li role="presentation"><a href="#tryme">Try it Out Yourself</a></li>
-</ul>
 <a name="demo"></a>
-  <h2 class="text-center">Demo</h2>
-  <div height="400" width="800"> </div>
+<h2 class="text-center">Demo <a class="alternate" href="#tryme">[or Try It Out]</a></h2>
+<p class="text-center">No! not a video, its an asciinema. Takes about 20KB to view this demo</p>
+<div style="min-height:400px" width="800"> </div>
 
-<!-- I am trying to NOT use javascript as much as possible -->
-<ul class="nav nav-pills">
-  <li role="presentation"><a href="#demo">Demo</a></li>
-  <li role="presentation" class="active"><a href="#tryme">Try it Out Yourself</a></li>
-</ul>
 <a name="tryme"></a>
-<h2 class="text-center">Hands On! Type this your your command line.</h2>
+<h2 class="text-center">Hands On! Type this your your command line <a class="alternate" href="#demo">[or Watch The Demo]</a></h2>
 <pre>
   echo "Current Date Time is `date`" | curl -X POST https://demo.daata.in/192_168_0_1/hello/
 </pre>
