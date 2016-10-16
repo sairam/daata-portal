@@ -35,9 +35,9 @@ body {
 }
 
 section#heading  {order: 0}
-section#tldr     {order: 1}
-section#solved   {order: 2}
-section#demo     {order: 3}
+section#demo     {order: 1}
+section#tldr     {order: 2}
+section#solved   {order: 3}
 section#subscribe{order: 4}
 section#who      {order: 5}
 section#origin   {order: 6}
@@ -100,9 +100,17 @@ section#footer   {order: 100}
 #floating-menu li:hover::before {
   color: #c54400;
 }
+
+#tldr .row {
+  display: flex;
+  flex-flow: row wrap;
+}
 #tldr .row > div {
+  text-align: center;
+  flex: 1 1 auto;
   border: 1px dashed #337ab7;
-  min-height: 10em;
+  /*height: 12rem;*/
+  /*overflow: scroll;*/
 }
 #tldr .row > div p {
   /*font-size: 0.8em;*/
@@ -236,22 +244,42 @@ section#footer   {order: 100}
 </section>
 
 <section id="demo" class="row">
-  TODO - add a screencast so that Demo can be linked to
+<div class="col-md-offset-2 col-md-8 col-sm-12">
+<ul class="nav nav-pills">
+  <li role="presentation" class="active"><a href="#demo">Demo</a></li>
+  <li role="presentation"><a href="#tryme">Try it Out Yourself</a></li>
+</ul>
+<a name="demo"></a>
   <h2 class="text-center">Demo</h2>
-  <a name="demo"></a>
-  <div class="col-md-offset-2 col-md-8 col-sm-12">
-    Sample Demo
+  <div height="400" width="800"> </div>
+
+<!-- I am trying to NOT use javascript as much as possible -->
+<ul class="nav nav-pills">
+  <li role="presentation"><a href="#demo">Demo</a></li>
+  <li role="presentation" class="active"><a href="#tryme">Try it Out Yourself</a></li>
+</ul>
+<a name="tryme"></a>
+<h2 class="text-center">Hands On! Type this your your command line.</h2>
 <pre>
   echo "Current Date Time is `date`" | curl -X POST https://demo.daata.in/192_168_0_1/hello/
 </pre>
 
 Now open <a target="_blank" href="https://demo.daata.in/192_168_0_1/hello/">https://demo.daata.in/192_168_0_1/hello/</a>
 
-<a href="/demo.html"><h2 class="text-center">Checkout more detailed Demos</h2></a>
+<br /><br />
+<div class="text-center row">
+
+<a class="btn btn-lg btn-primary" href="/demo.html"  role="button">Checkout All Demos</a>
+<a class="btn btn-lg btn-default" href="/demo.html"  role="button">Try All Demos Hands On</a>
+</div>
+<!-- <a href="/demo.html"><h2 class="text-center">Checkout all our Demos by Use Case</h2></a> -->
+<hr/>
+
 </div>
 </section>
 
-<div class="row hidden-sm" id="floating-menu">
+<div class="hidden-sm hidden-xs">
+<div class="row" id="floating-menu">
 <ul>
   <li><a href="#vision">Vision</a></li>
   <li><a href="#solved">Solved PainPoints</a></li>
@@ -264,6 +292,7 @@ Now open <a target="_blank" href="https://demo.daata.in/192_168_0_1/hello/">http
   <li><a href="/setup">Lets Set It Up</a></li>
   <li><a href="#subscribe">Subscribe</a></li>
 </ul>
+</div>
 </div>
 
 
