@@ -1,4 +1,4 @@
 +++
-title = ""
+title = "Upload static HTML designs"
 description = ""
 +++

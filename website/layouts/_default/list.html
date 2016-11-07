@@ -1,0 +1,20 @@
+{{ partial "header.html" . }}
+
+<section id="data" class="row">
+  <br>
+  {{ range first 1 .Data.Pages }}
+  <h1 class="text-center">List of all topics in "{{ humanize .Section }}" section</h1>
+
+  {{ end }}
+<div class="col-md-offset-2 col-md-8 col-sm-12">
+<div class="row">
+  {{ range .Data.Pages }}
+    {{ .Render "summary"}}
+  {{ end }}
+</div>
+</div>
+<br>
+</section>
+
+{{ partial "menu.html" . }}
+{{ partial "footer.html" . }}

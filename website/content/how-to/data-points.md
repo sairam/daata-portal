@@ -1,5 +1,5 @@
 +++
-title = ""
+title = "Add Data Points to Histograms"
 description = ""
 +++
 

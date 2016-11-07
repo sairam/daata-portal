@@ -2,7 +2,7 @@ baseurl = "https://daata.in/"
 title = "Daata Portal"
 description = ""
 languageCode = "en-us"
-googleAnalytics = "UA-86973229-1"
+googleAnalytics = "UA-86973229-1111"
 
 [Params]
 gitRepoLink = "https://github.com/sairam/daata-portal"

@@ -1,4 +1,4 @@
 +++
-title = ""
+title = "Upload Static Files"
 description = ""
 +++

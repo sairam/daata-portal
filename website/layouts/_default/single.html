@@ -1,8 +1,35 @@
 {{ partial "header.html" . }}
 
-Yo
+<section id="data" class="row">
+<br>
+<h1 class="text-center">[{{ humanize .Section }}] {{ .Title }}</h1>
+<div class="col-md-offset-2 col-md-8 col-sm-12">
+  {{ if isset .Params "warning" }}
+  <div class="alert alert-warning text-center" role="alert"><h4> NOTE: {{ .Params.warning | safeHTML }}</h4></div>
+  {{ end }}
 
-{{ .Content }}
+
+  {{ .Content }}
+
+  <br>
+  <hr>
+
+  {{ if isset .Params "see_also" }}
+  {{ $seeAlso := index .Params "see_also" }}
+  <h4>See Also</h4>
+  <ol>
+    {{ range where .Site.Pages "Section" .Section }}
+    {{ if in $seeAlso .File.BaseFileName }}
+      <li><a href="{{ .RelPermalink }}" alt="{{ .Title }}">{{ .LinkTitle }}</a></li>
+    {{ end }}
+    {{ end }}
+  </ol>
+  {{ end }}
+
+</div>
+</section>
+
+<!-- TODO - add other articles from the same section  -->
 
 {{ partial "menu.html" . }}
 {{ partial "footer.html" . }}
