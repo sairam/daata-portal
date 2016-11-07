@@ -1,0 +1,4 @@
++++
++++
+
+1. type the command to provide a static webpage

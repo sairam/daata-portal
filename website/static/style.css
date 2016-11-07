@@ -1,0 +1,117 @@
+pre {
+  font-family: 'Cousine', monospace;
+  font-size: 1em;
+  line-height: 2em;
+}
+
+#clone-banner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  border: 0;
+}
+
+/* for index.html */
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+section#heading  {order: 0}
+section#demo     {order: 1}
+section#tldr     {order: 2}
+section#who      {order: 3}
+section#subscribe{order: 4}
+section#solved   {order: 5}
+section#origin   {order: 6}
+section#tosolve  {order: 7}
+section#footer   {order: 100}
+
+#subscribe, .center {
+  display: flex;
+ flex-direction: row;
+ flex-wrap: wrap;
+ justify-content: center;
+ align-items: center;
+}
+
+#solved li, #tosolve li {
+    display: block;
+}
+
+#solved li:before {
+  content: "\e067";
+  font-family: 'Glyphicons Halflings';
+  float: left;
+  padding-right: 0.66em;
+  color: #44c500;
+}
+#tosolve li::before {
+  content: "\e157";
+  font-family: 'Glyphicons Halflings';
+  float: left;
+  padding-right: 0.66em;
+  color: #c54400;
+}
+.well {
+  border-left: 2em solid #bbb;
+  border-right: 2em solid #bbb;
+  background-color: #eee;
+  color: #337ab7;
+}
+
+#floating-menu {
+  position: fixed;
+  top: 35%;
+  left: 0;
+  background-color: white;
+  border: 1px black dashed;
+  padding: 1em 1em 1em 0em;
+  font-size: 0.9em;
+  line-height: 1.5em;
+}
+#floating-menu li {
+  display: block;
+}
+#floating-menu li::before {
+  content: "\e006";
+  font-family: 'Glyphicons Halflings';
+  font-size: 14px;
+  padding-bottom: 2px;
+  padding-right: 5px;
+}
+#floating-menu li:hover::before {
+  color: #c54400;
+}
+
+#tldr .row {
+  display: flex;
+  flex-flow: row wrap;
+}
+#tldr .row > div {
+  text-align: center;
+  flex: 1 1 auto;
+  padding: 1.66em;
+  background-color: white;
+  border: 1px dashed #337ab7;
+  /*height: 12rem;*/
+  /*overflow: scroll;*/
+}
+#tldr .row > div p {
+  /*font-size: 0.8em;*/
+  /*line-height: 1.1em;*/
+}
+.well p {
+  color: black;
+  font-family: 'Cousine', monospace;
+}
+h2 .alternate {
+  font-size: 0.7em;
+  font-weight: normal;
+}
+h1 sub.alternate, h1 sup.alternate {
+  font-size: 0.7em;
+  font-weight: lighter;
+}
