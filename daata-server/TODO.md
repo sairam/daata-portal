@@ -15,6 +15,7 @@
 1. Authorization token by user for all entities
 1. Public website and Dashboard development in parallel
 1. Webhooks
+1. Make a Docker image to host using services like https://hyper.sh/
 
 ## Workflows
 ### Upload documentation / Release Notes
@@ -73,19 +74,6 @@
 1. External widgets like images/text can be refreshed by frequency
 1. UI may need data like MIN, MAX, UNIQUE, COUNT, SUM, AVERAGE, P99, P95 etc.,
 
-## Main Website
-* www.daata.xyz will contain the static website  (see if you can generate with hugo with a theme?)
-* /blog/...
-* /about
-* /help
-* /usage
-* /use-cases/ - another blog / detail with data like how ifttt does with recipes
-* /how-it-is-being-used/ - testimonials from customers
-* /innovative-dashboard/
-* /pricing
-* /{feature}
-(think about SEO keywords to use here)
-
 ## Types of URLs
 1. Company accounts - has subdomain like google.daata.xyz/repo/url
 1. Personal accounts - at my.daata.xyz/repo/data.txt ????
@@ -124,3 +112,4 @@
 1. Graphs - add timeframe - relative/ absolute with TZ (keen.io)
 1. (Billing should be based on no. of data points - like stathat.com)
 1. Drag/Drop grids in UI - https://github.com/troolee/gridstack.js | https://github.com/hootsuite/grid | https://github.com/ducksboard/gridster.js
+1. edit/find html based on CSS selectors in the UI editor
