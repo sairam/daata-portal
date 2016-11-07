@@ -1,4 +1,6 @@
 +++
+title = ""
+description = ""
 +++
 
 Should contain configurations like public/private setups.

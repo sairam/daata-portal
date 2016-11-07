@@ -5,14 +5,18 @@
 <link href="/style.css" rel="stylesheet">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Daata | Solving Developer Pain Points one at a time</title>
+<title>Daata </title>
 
+<meta name="description" content="{{ if .IsNode }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ else }}{{ with .Description }}{{ . }}{{ end }}{{ end }}">
+
+<title>{{ if .IsHome }}{{ .Title }} || {{ .Site.Params.homeTitle }} {{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
 
 <body class="container-fluid">
 <section id="heading" class="row">
   <a name="vision"></a>
   <div class="col-md-offset-2 col-md-8 col-sm-12">
-  <h1 class="text-center"><sub class="alternate">the</sub> <u>Daata</u> <sup class="alternate">project</sup></h1>
-  <article class="text-center">Our <u>Vision</u> is to <u>Solve</u> Developer pain points as well as to <u>Empower</u> small teams with business solutions</article>
+  <h1 class="text-center"><sub class="alternate" style="text-transform: uppercase; letter-spacing: 2px;">the</sub> <u>Daata Portal</u></h1>
+  <h3 class="text-center">The New Age Pastebin</h3>
+  <!-- <article class="text-center">Our <u>Vision</u> is to <u>Solve</u> Developer pain points as well as to <u>Empower</u> small teams with business solutions</article> -->
   <hr/>
 </section>

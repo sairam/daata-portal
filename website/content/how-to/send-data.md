@@ -1,4 +1,6 @@
 +++
+title = ""
+description = ""
 +++
 
 Standard Paste Bin

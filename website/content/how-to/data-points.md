@@ -1,4 +1,6 @@
 +++
+title = ""
+description = ""
 +++
 
 You can collect data points and plot them on a graph to understand.

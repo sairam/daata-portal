@@ -1,0 +1,5 @@
++++
+title = ""
+description = ""
+layouts = "blank"
++++

@@ -1,0 +1,19 @@
+<div class="hidden-sm hidden-xs">
+<div class="row" id="floating-menu">
+<ul>
+  {{ if .IsHome }}
+  <li><a href="#vision">Vision</a></li>
+  <li><a href="#solved">Solved PainPoints</a></li>
+  <li><a href="#tosolve">Solutions <sub>In Progress</sub></a></li>
+  {{ end }}
+
+  <li><a target="_blank" href="/demo">Demo</a> | <a href="/how-to/">Usage</a></li>
+  <!-- <li><a href="https://daata.xyz/?utm_source=daata.in&utm_intent=Hosted">Hosted Solution</a></li> -->
+  <li><a href="/use-cases">All Use Cases</a></li>
+  <li><a target="_blank" href="{{ .Site.Params.gitRepoLink }}">Source Code</a></li>
+  <li><a href="/faq">FAQ</a> || <a href="{{ .Site.Params.gitRepoLink }}/issues/new" target="_blank">Ask</a></li>
+  <li><a href="/setup">Setup in a minute</a></li>
+  <li><a href="#subscribe">Subscribe</a></li>
+</ul>
+</div>
+</div>

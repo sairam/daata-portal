@@ -1,4 +1,4 @@
-{{ partial "header.html" . }}
+{{ partial "header" . }}
 
 <section id="tldr" class="row well">
   <div class="col-md-offset-2 col-md-8 col-sm-12">
@@ -39,16 +39,16 @@
   <div class="col-md-offset-2 col-md-8 col-sm-12">
   <h3 class="text-left">Pain Points Solved</h3>
   <ul>
-  <li><u><a href="/how-to/versioned-documentation.html">Versioned Documentation</a></u> by Project for teams inside/across companies. <a href="/use-cases/better-documentation.html">(Google Docs just wont cut it)</a></li>
-  <li>Inspire your team by displaying <u><a href="/how-to/data-points.html">Code Coverage</a></u> on your Status Screen</li>
-  <li><a href="/how-to/static-files.html">Reviewing designs/HTML files</a> prototypes made. <a href="/use-cases/static-webpage.html">When you need to showcase to your co-worker</a></li>
-  <li><a href="/how-to/fetch-from-database.html">Fetching information from database</a> and <a href="/use-cases/orders-total-today.html">portray your daily revenue realtime</a></li>
-  <li>Make Dashboards from Code Coverage or Order Totals generated earlier <a href="/use-cases/quick-dashboards.html">to make insightful graphs</a></li>
-  <li><a href="/how-to/url-shortner.html">URL Shortners to easily share/shout/remember URLs</a> for <a href="/use-cases/short-urls.html">sending reports</a></li>
-  <li><a href="/how-to/send-data.html">The Pastebin you always wanted</a></li>
-  <li><a href="/how-to/append-data.html">Fetch data from 10+ servers</a> and <a href="/use-cases/multi-host-processing.html">process into information</a></li>
-  <li><a href="/how-to/send-json-on-rest.html">Visualize a non-production API call/webhook(Example: Email/SMS) on the browser</a> instead of <a href="/use-cases/mock-services-for-staging.html">paying for the price to production APIs</a></li>
-  <li>This is <u>One Miscellaneous server</u> your <a href="/how-to/server-management.html">DevOps would love to manage</a>.</li>
+  <li><u><a href="/how-to/versioned-documentation">Versioned Documentation</a></u> by Project for teams inside/across companies. <a href="/use-cases/better-documentation">(Google Docs just wont cut it)</a></li>
+  <li>Inspire your team by displaying <u><a href="/how-to/data-points">Code Coverage</a></u> on your Status Screen</li>
+  <li><a href="/how-to/static-files">Reviewing designs/HTML files</a> prototypes made. <a href="/use-cases/static-webpage">When you need to showcase to your co-worker</a></li>
+  <li><a href="/how-to/fetch-from-database">Fetching information from database</a> and <a href="/use-cases/orders-total-today">portray your daily revenue realtime</a></li>
+  <li>Make Dashboards from Code Coverage or Order Totals generated earlier <a href="/use-cases/quick-dashboards">to make insightful graphs</a></li>
+  <li><a href="/how-to/url-shortner">URL Shortners to easily share/shout/remember URLs</a> for <a href="/use-cases/short-urls">sending reports</a></li>
+  <li><a href="/how-to/send-data">The Pastebin you always wanted</a></li>
+  <li><a href="/how-to/append-data">Fetch data from 10+ servers</a> and <a href="/use-cases/multi-host-processing">process into information</a></li>
+  <li><a href="/how-to/send-json-on-rest">Visualize a non-production API call/webhook(Example: Email/SMS) on the browser</a> instead of <a href="/use-cases/mock-services-for-staging">paying for the price to production APIs</a></li>
+  <li>This is <u>One Miscellaneous server</u> your <a href="/how-to/server-management">DevOps would love to manage</a>.</li>
   </ul>
 
   <br/>
@@ -68,12 +68,12 @@
 <div class="col-md-offset-2 col-md-8 col-sm-12">
   <h2 class="text-center">Solutions In Progress</h2>
   <hr />
-  <h3>We have a plan to work on the following. <a href="https://github.com/sairam/daata/issues/new">Let us know if you want us to solve your usecase</a></h3>
+  <h3>We have a plan to work on the following. <a target="_blank" href="{{ .Site.Params.gitRepoLink }}/issues/new">Let us know if you want us to solve your usecase</a></h3>
 <ul>
-  <li><a href="/use-cases/debugging-http-requests.html">Debugging HTTP/REST calls across services on staging/development</a></li>
-  <li><a href="/use-cases/proxying-http-requests.html">Proxying / Debugging requests</a></li>
-  <li><a href="/use-cases/replaying-http-requests.html">Proxy/Replay HTTP/REST requests during development</a></li>
-  <li><a href="https://github.com/sairam/daata/wiki/Setup/DigitalOcean">Simple setup on Digital Ocean</a>, <a href="https://github.com/sairam/daata/wiki/AWS">AWS</a>, <a href="https://github.com/sairam/daata/wiki/Setup/GoogleCloud">Google Cloud</a> </li>
+  <li><a href="/use-cases/debugging-http-requests">Debugging HTTP/REST calls across services on staging/development</a></li>
+  <li><a href="/use-cases/proxying-http-requests">Proxying / Debugging requests</a></li>
+  <li><a href="/use-cases/replaying-http-requests">Proxy/Replay HTTP/REST requests during development</a></li>
+  <li><a href="/setup/digital-ocean">Simple setup on Digital Ocean</a>, <a href="/setup/aws">AWS</a>, <a href="/setup/google-cloud">Google Cloud</a> </li>
 </ul>
 
 </div>
@@ -84,7 +84,7 @@
   <h2 class="text-center">Who is this aimed for?</h2>
   <hr />
   The tool is aimed for small development teams who want to host any miscellaneous data.<br/><br/>
-  The tool can be self hosted on any server in your intranet or the internet. It has been <a href="https://demo.daata.in/">Tested on Linux</a>, Mac OS X. <br /><br/>
+  The tool can be self hosted on any server in your intranet or the internet. It has been <a href="{{ .Site.Params.demoURL }}">Tested on Linux</a>, Mac OS X. <br /><br/>
   The use case of this service is to help solve problems and pain points for hundreds of thousands of developers, not necessiarly to scale(<a href="https://sair.am/portfolio/" target="_blank">although we usually work on large scale problems</a>).
   <br/><br/>
   See <a href="/use-cases/">All Use Cases</a> that <a href="#solved">we are solving</a> and <a href="#tosolve">what's next</a>.
@@ -126,79 +126,28 @@
 <p class="text-center">No! not a video, its an asciinema. Takes about 20KB to view this demo</p>
 
 <!-- script type="text/javascript" src="https://asciinema.org/a/14.js" id="asciicast-14" async data-autoplay="true" data-size="small"></script-->
-
 <!-- <div style="min-height:400px" width="800"> </div> -->
 
 <a name="tryme"></a>
 <h2 class="text-center">Hands On! Type this your your command line <a class="alternate" href="#demo">[or Watch The Demo]</a></h2>
 <pre>
-  echo "Current Date Time is `date`" | curl -X POST https://demo.daata.in/192_168_0_1/hello/
+  echo "Current Date Time is `date`" | curl -X POST {{ .Site.Params.demoURL }}/192_168_0_1/hello/
 </pre>
 
-Now open <a target="_blank" href="https://demo.daata.in/192_168_0_1/hello/">https://demo.daata.in/192_168_0_1/hello/</a>
+Now open <a target="_blank" href="{{ .Site.Params.demoURL }}/192_168_0_1/hello/">{{ .Site.Params.demoURL }}/192_168_0_1/hello/</a>
 
 <br /><br />
 <div class="text-center row">
 
-<a class="btn btn-lg btn-primary" href="/demo.html"  role="button">Checkout All Demos</a>
-<a class="btn btn-lg btn-default" href="/demo.html"  role="button">Try All Demos Hands On</a>
+<a class="btn btn-lg btn-primary" href="/demo"  role="button">Checkout All Demos</a>
+<a class="btn btn-lg btn-default" href="/demo"  role="button">Try All Demos Hands On</a>
 </div>
-<!-- <a href="/demo.html"><h2 class="text-center">Checkout all our Demos by Use Case</h2></a> -->
+<!-- <a href="/demo"><h2 class="text-center">Checkout all our Demos by Use Case</h2></a> -->
 <hr/>
 
 </div>
 </section>
 
-<div class="hidden-sm hidden-xs">
-<div class="row" id="floating-menu">
-<ul>
-  <li><a href="#vision">Vision</a></li>
-  <li><a href="#solved">Solved PainPoints</a></li>
-  <li><a href="#tosolve">Solutions <sub>In Progress</sub></a></li>
-  <li><a href="/demo.html">Demo</a> | <a href="/how-to/">Usage</a></li>
-  <!-- <li><a href="https://daata.xyz/?utm_source=daata.in&utm_intent=Hosted">Hosted Solution</a></li> -->
-  <li><a href="/use-cases/">All Use Cases</a></li>
-  <li><a href="https://github.com/sairam/daata/">Source Code</a></li>
-  <li><a href="/faq.html">FAQ</a> || <a href="https://github.com/sairam/daata/issues/new" target="_blank">Ask</a></li>
-  <li><a href="/setup">Lets Set It Up</a></li>
-  <li><a href="#subscribe">Subscribe</a></li>
-</ul>
-</div>
-</div>
+{{ partial "menu" . }}
 
-
-<!-- Common Footer -->
-<section class="row well" id="subscribe">
-  <a name="subscribe"></a>
-  <div class="col-md-8 col-sm-12">
-    <h2 class="text-center"><span class="glyphicon glyphicon-bullhorn" style="color: #000" aria-hidden="true">&nbsp;</span>Subscribe here to get news updates</h2>
-    <!-- <h3 class="text-right">Or <a href="/feed">Use the <span class="glyphicon glyphicon-link" aria-hidden="true"></span>Feed</a></h3> -->
-    <form class="form-horizontal" action="https://tinyletter.com/daata" method="post" target="popupwindow" onsubmit="window.open('https://tinyletter.com/daata', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true">
-      <div class="form-group">
-        <label class="col-md-3 col-sm-12" for="tlemail">Enter your email address</label>
-        <div class="col-md-9 col-sm-8">
-          <input type="text"  class="form-control" name="email" placeholder="your.name@example.com" id="tlemail" />
-        </div>
-      </div>
-      <input type="hidden" value="1" name="embed"/><input type="hidden" value="Lemme know the latest updates" />
-      <div class="form-group">
-        <div class="col-sm-12 col-md-offset-3 col-md-9">
-          <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-road" aria-hidden="true">&nbsp;</span>Keep me upto date about this interesting project</button>
-          <p>Powered by TinyLetter(of Mailchimp)</p>
-        </div>
-      </div>
-    </form>
-  </div>
-</section>
-<div id="clone-banner">
-<a href="https://github.com/sairam/daata" rel="nofollow author" title="Daata on Git">
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" fill="#151513">
-  <path d="M0 0l115 115h15l12 27 108 108V0z" fill="#fff"/>
-  <path class="octo-arm" d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16" style="transform-origin: 130px 106px"/>
-  <path class="octo-body" d="M115 115s4 2 5 0l14-14c3-2 6-3 8-3-8-11-15-24 2-41 5-5 10-7 16-7 1-2 3-7 12-11 0 0 5 3 7 16 4 2 8 5 12 9s7 8 9 12c14 3 17 7 17 7-4 8-9 11-11 11 0 6-2 11-7 16-16 16-30 10-41 2 0 3-1 7-5 11l-12 11c-1 1 1 5 1 5z"/>
-</svg>
-</a>
-</div>
-
-
-{{ partial "footer.html" . }}
+{{ partial "footer" . }}

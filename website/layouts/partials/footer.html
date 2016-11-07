@@ -1,11 +1,48 @@
 
+<!-- Common Footer -->
+<section class="row well" id="subscribe">
+  <a name="subscribe"></a>
+  <div class="col-md-8 col-sm-12">
+    <h2 class="text-center"><span class="glyphicon glyphicon-bullhorn" style="color: #000" aria-hidden="true">&nbsp;</span>Subscribe here to get news updates</h2>
+    <!-- <h3 class="text-right">Or <a href="/feed">Use the <span class="glyphicon glyphicon-link" aria-hidden="true"></span>Feed</a></h3> -->
+    <form class="form-horizontal" action="https://tinyletter.com/daata" method="post" target="popupwindow" onsubmit="window.open('https://tinyletter.com/daata', 'popupwindow', 'scrollbars=yes,width=800,height=600');return true">
+      <div class="form-group">
+        <label class="col-md-3 col-sm-12" for="tlemail">Enter your email address</label>
+        <div class="col-md-9 col-sm-8">
+          <input type="text"  class="form-control" name="email" placeholder="your.name@example.com" id="tlemail" />
+        </div>
+      </div>
+      <input type="hidden" value="1" name="embed"/><input type="hidden" value="Lemme know the latest updates" />
+      <div class="form-group">
+        <div class="col-sm-12 col-md-offset-3 col-md-9">
+          <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-road" aria-hidden="true">&nbsp;</span>Keep me upto date about this interesting project</button>
+          <p>Powered by TinyLetter(of Mailchimp)</p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div id="clone-banner">
+<a href="{{ .Site.Params.gitRepoLink }}" rel="nofollow author" title="Daata on Git">
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" fill="#151513">
+  <path d="M0 0l115 115h15l12 27 108 108V0z" fill="#fff"/>
+  <path class="octo-arm" d="M128 109c-15-9-9-19-9-19 3-7 2-11 2-11-1-7 3-2 3-2 4 5 2 11 2 11-3 10 5 15 9 16" style="transform-origin: 130px 106px"/>
+  <path class="octo-body" d="M115 115s4 2 5 0l14-14c3-2 6-3 8-3-8-11-15-24 2-41 5-5 10-7 16-7 1-2 3-7 12-11 0 0 5 3 7 16 4 2 8 5 12 9s7 8 9 12c14 3 17 7 17 7-4 8-9 11-11 11 0 6-2 11-7 16-16 16-30 10-41 2 0 3-1 7-5 11l-12 11c-1 1 1 5 1 5z"/>
+</svg>
+</a>
+</div>
+
+
 <section id="footer" class ="row">
 <footer class="text-center">
 <hr />
-Made with <span class="glyphicon glyphicon-heart" style="color: red" aria-hidden="true"></span> with <a href="https://golang.org">Go</a><br/>
-&copy; <a href="https://sair.am/">Sairam</a> 2016 (website powered by <a href="https://gohugo.io/">hugo</a>)
+Made with <span class="glyphicon glyphicon-heart" style="color: red" aria-hidden="true"></span> with <a target="_blank" href="https://golang.org">Go</a> &amp; <a target="_blank" href="https://gohugo.io/">hugo</a>)<br/>
+&copy; <a target="_blank" href="https://sair.am/">Sairam</a> 2016
 </footer>
 </section>
+
+{{ template "_internal/google_analytics_async.html" . }}
 
 </body>
 </html>
