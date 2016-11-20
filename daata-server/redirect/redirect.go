@@ -92,14 +92,15 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 		}
 
 	default:
-		http.NotFound(w, r)
+		http.Error(w, "", http.StatusUnprocessableEntity)
+		// http.NotFound(w, r)
 	}
 }
 
 // Helper methods
 func stripPrefix(path string) string {
 	p := strings.TrimPrefix(path, RedirectPrefix)
-	if p[0] == '/' {
+	if p != "" && p[0] == '/' {
 		return p[1:]
 	}
 	return p

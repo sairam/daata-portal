@@ -46,7 +46,7 @@ func (u *urlShortner) Find() error {
 
 // TODO - check how to make this cleaner
 func (u *urlShortner) Validate() []error {
-	var errs = make([]error, 1)
+	var errs []error
 	var err []error
 
 	err = validateURLs(u.shortURL, validateShortURL)
@@ -64,7 +64,7 @@ func (u *urlShortner) Validate() []error {
 }
 
 func validateURLs(url string, fs ...func(string) error) []error {
-	var errs = make([]error, 1)
+	var errs []error
 	for _, f := range fs {
 		err := f(url)
 		if err != nil {
@@ -90,9 +90,9 @@ func validateBlankURL(str string) error {
 }
 
 func validateRelativePath(str string) error {
-	if str[0] != '/' {
-		return errors.New("url does not start with '/'")
-	}
+	// if str[0] != '/' {
+	// 	return errors.New("url does not start with '/'")
+	// }
 	// ensure does not have script tag
 	return nil
 }

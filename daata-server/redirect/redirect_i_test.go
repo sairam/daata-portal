@@ -108,6 +108,75 @@ func fetchResponse(url string) (response *http.Response, err error) {
 	return http.Get(url)
 }
 
+func TestUnKnownPath(t *testing.T) {
+	shortURL := utils.RandomString(4)
+
+	ts := httptest.NewServer(http.HandlerFunc(Redirect))
+	urlEp := ts.URL + "/"
+	defer ts.Close()
+	response, _ := fetchResponse(urlEp + shortURL + "+")
+	if response.StatusCode != 404 {
+		t.Errorf("Magically found a unicorn! ")
+	}
+
+}
+
+func TestUnsupportedPUTCall(t *testing.T) {
+
+	ts := httptest.NewServer(http.HandlerFunc(Redirect))
+	urlEp := ts.URL + "/"
+	defer ts.Close()
+
+	data1 := map[string]string{
+		"short_url": "shortURL",
+		"long_url":  "https://www.example.com",
+		"override":  "true",
+	}
+
+	kv := url.Values{}
+	for k, t := range data1 {
+		kv.Set(k, t)
+	}
+
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+
+	var fw io.Writer
+	var err error
+
+	for k, v := range kv {
+		if fw, err = w.CreateFormField(k); err != nil {
+			return
+		}
+		if _, err = fw.Write([]byte(v[0])); err != nil {
+			return
+		}
+	}
+
+	req, err := http.NewRequest("PUT", ts.URL+"/r/", &b)
+
+	response, err := submitForm(urlEp, kv, "")
+	ioutil.ReadAll(response.Body)
+	response.Body.Close()
+
+	if err != nil {
+		t.Errorf("error submitting form %s", err)
+	}
+
+	if err != nil {
+		return
+	}
+	// Don't forget to set the content type, this will contain the boundary.
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	// Submit the request
+	client := &http.Client{}
+	res, _ := client.Do(req)
+	if res.StatusCode != 422 {
+		t.Errorf("PUT should not be processable")
+	}
+}
+
 func TestWithOverrideTrue(t *testing.T) {
 	shortURL := utils.RandomString(4)
 	data := map[string]string{

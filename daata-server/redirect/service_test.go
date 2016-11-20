@@ -29,6 +29,16 @@ func TestCreateOrUpdateWithoutShortURL(t *testing.T) {
 
 }
 
+func TestValidate(t *testing.T) {
+	url := &urlShortner{
+		longURL: "https://www.daata.xyz",
+	}
+	errs := url.Validate()
+	if len(errs) > 0 {
+		t.Errorf("Error Validating entity, %s", errs)
+	}
+}
+
 // tests existing url with override
 func TestCreateOrUpdateWithOverride(t *testing.T) {
 	shortURL := utils.RandomString(4)
