@@ -3,95 +3,23 @@ package redirect
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
+
+	"github.com/spf13/afero"
 
 	conf "../config/"
 	"../utils/"
 )
 
-type persistInterface interface {
-	exists() bool
-	read()
-	insert() error
-	update() error
-}
-
-// TODO use these structs
+// model
 type urlShortner struct {
 	shortURL string
 	longURL  string
 	override bool
 }
 
-/* Query Data Store */
-
-// returns true if the file exists
-// returns false if the file does not exist
-func (u *urlShortner) exists() bool {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	if _, err := os.Stat(u.shortURL); os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
-func (u *urlShortner) read() error {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	data, err := ioutil.ReadFile(u.shortURL)
-	if err != nil {
-		return err
-	}
-
-	dataStr := string(data)
-	u.longURL = strings.Split(dataStr, "\n")[0]
-
-	return nil
-}
-
-func (u *urlShortner) insert() error {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	file, err := os.OpenFile(u.shortURL, os.O_WRONLY|os.O_CREATE, os.FileMode(0600))
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-	file.WriteString(u.longURL + "\n")
-	return nil
-}
-
-func (u *urlShortner) update() error {
-	dir := moveToDir()
-	os.Chdir(dir())
-	defer os.Chdir(dir())
-
-	file, err := os.OpenFile(u.shortURL, os.O_WRONLY, os.FileMode(0600))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	file.Truncate(0)
-	file.WriteString(u.longURL + "\n")
-	return nil
-}
-
-func moveToDir() func() string {
-	// this is the file system prefix
-	return utils.MoveToFromDir(RedirectPrefix + "/")
-}
-
+// This interface for using the service
 type serviceInterface interface {
 	Validate() error
 	CreateOrUpdate() error
@@ -134,75 +62,19 @@ func (u *urlShortner) Find() error {
 }
 
 func stripPrefix(path string) string {
-	if p := strings.TrimPrefix(path, RedirectPrefix); len(p) < len(path) {
-		if p[0] == '/' {
-			return p[1:]
-		}
-		return p
+	p := strings.TrimPrefix(path, RedirectPrefix)
+	if p[0] == '/' {
+		return p[1:]
 	}
-	return ""
-}
-
-// TODO - check how to make this cleaner
-func (u *urlShortner) Validate() error {
-	var err error
-
-	err = validateShortURL(u.shortURL)
-	if err != nil {
-		return err
-	}
-
-	err = validateBlankURL(u.longURL)
-	if err != nil {
-		return err
-	}
-
-	valid, err := validateLongURL(u.longURL)
-	if err != nil {
-		return err
-	}
-
-	if !valid {
-		err = validateRelativePath(u.longURL)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func validateShortURL(_ string) error {
-	// ensure there are no spaces, dots or any such
-	// whitelist with unicode chars.
-	// TODO - make a demo with emojicons
-	// validate if its a valid file system path
-	return nil
-}
-
-func validateBlankURL(str string) error {
-	if str == "" {
-		return errors.New("long_url is blank")
-	}
-	return nil
-}
-
-func validateRelativePath(str string) error {
-	if str[0] != '/' {
-		return errors.New("url does not start with '/'")
-	}
-	// ensure does not have script tag
-	return nil
-}
-
-func validateLongURL(_ string) (bool, error) {
-	// TODO check if url starts with http or https
-	return true, nil
+	return p
 }
 
 func stripIfRedirect(path string) (string, bool) {
 	redirect := true
 	length := len(path) - 1
+	if len(path)-1 < 0 {
+		return path, false
+	}
 	if path[length] == '+' {
 		redirect = false
 		path = path[:length]
@@ -222,17 +94,22 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		path, redirect := stripIfRedirect(shortURL)
-		u := &urlShortner{shortURL: path}
-		err := u.Find()
-		url := u.longURL
-
-		if err != nil || url == "" {
+		if path == "" {
+			// display 'new' page
 			http.NotFound(w, r)
 		} else {
-			if redirect {
-				http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			u := &urlShortner{shortURL: path}
+			err := u.Find()
+			url := u.longURL
+
+			if err != nil || url == "" {
+				http.NotFound(w, r)
 			} else {
-				fmt.Fprintf(w, url)
+				if redirect {
+					http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+				} else {
+					fmt.Fprintf(w, url)
+				}
 			}
 		}
 	case http.MethodPost:
@@ -265,6 +142,14 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 //RedirectPrefix is required to generate redirect links
 const RedirectPrefix = "/r"
 
+var appFs afero.Fs
+var fsutil *afero.Afero
+
 func init() {
+	// "r" is the directory
+
+	appFs = afero.NewBasePathFs(afero.NewOsFs(), conf.C().Redirect.Directory)
+	fsutil = &afero.Afero{Fs: appFs}
+
 	http.HandleFunc(RedirectPrefix+"/", Redirect)
 }

@@ -24,7 +24,14 @@ func init() {
 }
 
 func loadConfig() *AppConfig {
-	f, err := os.Open("./config.toml")
+	var f *os.File
+	var err error
+	_, err = os.Stat("../config.toml")
+	if err == nil {
+		f, err = os.Open("../config.toml")
+	} else {
+		f, err = os.Open("./config.toml")
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -80,6 +87,7 @@ type directories struct {
 }
 
 type redirect struct {
-	Length int
-	Prefix string
+	Length    int
+	Directory string
+	Prefix    string
 }

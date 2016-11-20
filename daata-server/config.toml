@@ -1,6 +1,6 @@
 [server]
 port = 8001
-url = "https://b192ef12.ap.ngrok.io"
+url = "https://98d79dd2.ap.ngrok.io"
 
 [upload]
 size_limit = 5000 # form size and every other
@@ -20,4 +20,5 @@ display = "/Users/ram/src/mvp/daata-go/daata-server/display/"
 
 [redirect]
 length = 6
+directory = "/Users/ram/src/mvp/daata-go/data/r"
 prefix = "/r"

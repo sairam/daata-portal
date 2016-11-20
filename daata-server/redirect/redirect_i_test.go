@@ -1,26 +1,32 @@
-package redirect_test
+package redirect
 
 import (
 	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
+
+	"../utils"
+
+	"github.com/spf13/afero"
 )
 
-const host = "http://localhost:8001/"
 const redirectURL = "r/"
 
 func TestMain(m *testing.M) {
-	fmt.Println("------------")
+	appFs = afero.NewMemMapFs()
+	fsutil = &afero.Afero{Fs: appFs}
 	// defer cleanup()
 	// TODO setup config
-	os.Exit(m.Run())
 
+	os.Exit(m.Run())
 }
 
 func TestSubmitActualForm(t *testing.T) {
@@ -100,13 +106,15 @@ func submitForm(url string, kv url.Values, file string) (response *http.Response
 func fetchResponse(url string) (response *http.Response, err error) {
 	return http.Get(url)
 }
-func TestWithOverride(t *testing.T) {
+
+func TestWithOverrideTrue(t *testing.T) {
+	shortURL := utils.RandomString(4)
 	data := map[string]string{
-		"short_url": "test",
+		"short_url": shortURL,
 		"long_url":  "https://www.example.com",
 		"override":  "true",
 	}
-	response := actualTest(host+redirectURL, data, t)
+	response := makeTheCall(redirectURL, data, t)
 
 	if response != data["long_url"] {
 		t.Errorf("Problem. unable to set %s | %s", response, data["long_url"])
@@ -114,42 +122,73 @@ func TestWithOverride(t *testing.T) {
 }
 
 func TestWithoutOverride(t *testing.T) {
+	shortURL := utils.RandomString(4)
 	data := map[string]string{
-		"short_url": "test",
+		"short_url": shortURL,
 		"long_url":  "https://www.sairam.com",
 	}
-	response := actualTest(host+redirectURL, data, t)
+	response := makeTheCall(redirectURL, data, t)
 
-	if response == data["long_url"] {
+	if response != data["long_url"] {
 		t.Errorf("Problem. unable to set %s | %s", response, data["long_url"])
 	}
 }
 
-func TestWithFalseOverride(t *testing.T) {
+func TestWithOverrideFalse(t *testing.T) {
+	shortURL := utils.RandomString(4)
+
 	data := map[string]string{
-		"short_url": "test",
-		"long_url":  "https://www.data.com",
+		"short_url": shortURL,
+		"long_url":  "https://www.example.com",
 		"override":  "false",
 	}
-	response := actualTest(host+redirectURL, data, t)
+
+	response := makeTheCall(redirectURL, data, t)
+
+	if response != data["long_url"] {
+		t.Errorf("Problem. unable to set %s | %s", response, data["long_url"])
+	}
+
+	data = map[string]string{
+		"short_url": shortURL,
+		"long_url":  "https://www.example.in",
+		"override":  "false",
+	}
+	response = makeTheCall(redirectURL, data, t)
 
 	if response == data["long_url"] {
-		t.Errorf("Problem. unable to set %s | %s", response, data["long_url"])
+		t.Errorf("Problem. was able to override %s | %s", response, data["long_url"])
 	}
 }
 
-func actualTest(urlA string, data map[string]string, t *testing.T) string {
+func makeTheCall(urlA string, data map[string]string, t *testing.T) string {
+
+	ts := httptest.NewServer(http.HandlerFunc(Redirect))
+	urlEp := ts.URL + "/" + urlA
+	defer ts.Close()
 
 	v := url.Values{}
 	for k, t := range data {
 		v.Set(k, t)
 	}
-	response, err := submitForm(urlA, v, "")
-	response, err = fetchResponse(urlA + data["short_url"] + "+")
+	response, err := submitForm(urlEp, v, "")
+	ioutil.ReadAll(response.Body)
+	response.Body.Close()
 
 	if err != nil {
-		t.Errorf("ererrrr is %s", err)
+		t.Errorf("error submitting form %s", err)
 	}
-	ding, _ := ioutil.ReadAll(response.Body)
-	return string(ding)
+
+	response, err = fetchResponse(urlEp + data["short_url"] + "+")
+
+	if err != nil {
+		t.Errorf("error fetching response is %s", err)
+	}
+	ding, err := ioutil.ReadAll(response.Body)
+	response.Body.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fmt.Sprintf("%s", ding)
 }
