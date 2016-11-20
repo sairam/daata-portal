@@ -1,7 +1,7 @@
 package redirect
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -13,6 +13,8 @@ type persistenceInterface interface {
 	insert() error
 	update() error
 }
+
+// NOTE: persistence layer does not take care look at 'override' field from the model
 
 /* Query Data Store */
 
@@ -46,9 +48,9 @@ func (u *urlShortner) insert() error {
 
 	defer file.Close()
 	count, err := file.WriteString(u.longURL + "\n")
-	fmt.Printf("counted written as many as %d\n", count)
+	log.Printf("no. of bytes written is %d\n", count)
 	if err != nil {
-		fmt.Println("errror is ", err)
+		log.Printf("errror is %s", err)
 	}
 	return err
 }

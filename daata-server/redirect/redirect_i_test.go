@@ -1,5 +1,6 @@
 package redirect
 
+// This file contains URL endpoint test
 import (
 	"bytes"
 	"fmt"
@@ -184,6 +185,7 @@ func makeTheCall(urlA string, data map[string]string, t *testing.T) string {
 	if err != nil {
 		t.Errorf("error fetching response is %s", err)
 	}
+
 	ding, err := ioutil.ReadAll(response.Body)
 	response.Body.Close()
 
