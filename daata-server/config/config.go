@@ -20,7 +20,7 @@ func C() *AppConfig {
 
 func init() {
 	Config = loadConfig()
-	fmt.Println("Loaded config")
+	// fmt.Println("Loaded config")
 }
 
 func loadConfig() *AppConfig {

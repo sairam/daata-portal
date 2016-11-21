@@ -15,15 +15,13 @@ import (
 	"testing"
 
 	"../utils"
-
-	"github.com/spf13/afero"
 )
 
 const redirectURL = "r/"
 
 func TestMain(m *testing.M) {
-	appFs = afero.NewMemMapFs()
-	fsutil = &afero.Afero{Fs: appFs}
+	fsSettings("memory")
+	// TODO - see how "readFS" can be setup in the same test suite
 	// defer cleanup()
 	// TODO setup config
 

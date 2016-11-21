@@ -29,10 +29,22 @@ const (
 var appFs afero.Fs
 var fsutil *afero.Afero
 
-func init() {
-	appFs = afero.NewBasePathFs(afero.NewOsFs(), conf.C().Redirect.Directory)
+func fsSettings(val string) {
+	switch val {
+	case "memory":
+		appFs = afero.NewMemMapFs()
+	case "readFS":
+		appFs = afero.NewReadOnlyFs(afero.NewMemMapFs())
+	case "writeFS":
+		fallthrough
+	default:
+		appFs = afero.NewBasePathFs(afero.NewOsFs(), conf.C().Redirect.Directory)
+	}
 	fsutil = &afero.Afero{Fs: appFs}
+}
 
+func init() {
+	fsSettings("writeFS")
 	http.HandleFunc(RedirectPrefix+"/", Redirect)
 }
 
