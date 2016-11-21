@@ -2,6 +2,8 @@ package redirect
 
 import (
 	"errors"
+	"regexp"
+	"strings"
 
 	"../utils"
 )
@@ -48,6 +50,7 @@ func (u *urlShortner) Find() error {
 	return errors.New("no such url exists")
 }
 
+// Validate verifies shortURL and longURL
 func (u *urlShortner) Validate() []error {
 	var errs []error
 	var err []error
@@ -57,7 +60,7 @@ func (u *urlShortner) Validate() []error {
 		errs = append(errs, err...)
 	}
 
-	err = validateURLs(u.longURL, validateBlankURL, validateLongURL, validateRelativePath)
+	err = validateURLs(u.longURL, validateBlankURL, validateLongURL)
 
 	if err != nil {
 		errs = append(errs, err...)
@@ -77,30 +80,48 @@ func validateURLs(url string, fs ...func(string) error) []error {
 	return errs
 }
 
-func validateShortURL(_ string) error {
-	// ensure there are no spaces, dots or any such
-	// whitelist with unicode chars.
-	// TODO - make a demo with emojicons
-	// validate if its a valid file system path
-	return nil
+// ensure there are no spaces, dots or any such
+// whitelist with unicode chars.
+// TODO - make a demo with emoticons
+// validate if its a valid file system path
+func validateShortURL(s string) error {
+	if s == "" {
+		return nil
+	}
+	pattern := `[\p{L}|\d_-]+`
+	match, _ := regexp.MatchString(pattern, s)
+	if match == true {
+		return nil
+	}
+	return errors.New("unable to match pattern for short_url")
 }
 
-func validateBlankURL(str string) error {
-	if str == "" {
+func validateBlankURL(s string) error {
+	if s == "" {
 		return errors.New("long_url is blank")
 	}
 	return nil
 }
-
-func validateRelativePath(str string) error {
-	// if str[0] != '/' {
-	// 	return errors.New("url does not start with '/'")
-	// }
-	// ensure does not have script tag
+func validateLongURL(s string) error {
+	if err := validateLongURLProto(s); err != nil {
+		err1 := validateRelativePath(s)
+		if err1 != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func validateLongURL(_ string) error {
-	// TODO check if url starts with http or https
+func validateRelativePath(s string) error {
+	if s != "" && s[0] != '/' {
+		return errors.New("long_url does not start with '/'")
+	}
+	return nil
+}
+
+func validateLongURLProto(s string) error {
+	if !(strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://")) {
+		return errors.New("long_url is neither http or https protocol")
+	}
 	return nil
 }

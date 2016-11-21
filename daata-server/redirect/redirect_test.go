@@ -2,16 +2,17 @@ package redirect
 
 import "testing"
 
-// TODO - add regular tests
-// Add example tests as well https://blog.golang.org/examples
-// Add unit tests - http://localhost:6060/pkg/testing/
-// see generated godoc
 func TestStripPrefix(t *testing.T) {
 	str := stripPrefix(RedirectPrefix + "/abc")
 	if str != "abc" {
 		t.Errorf("StripPrefix is not removing %s", RedirectPrefix)
 	}
 }
+
+// func ExampleRedirect_second() {
+// 	fmt.Println(stripPrefix(RedirectPrefix + "/abc"))
+// 	// Output: abc
+// }
 
 func TestStripPrefixPlain(t *testing.T) {
 	path := RedirectPrefix

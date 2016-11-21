@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	conf "../config/"
+	conf "../config"
 )
 
 // model
@@ -17,13 +17,17 @@ type urlShortner struct {
 	override bool
 }
 
-//RedirectPrefix is required to generate redirect links
 const (
-	RedirectPrefix             = "/r"
+	//RedirectPrefix is required to generate redirect links
+	RedirectPrefix = "/r"
+	//AutoGenerateShortURLLength - length of auto generated short urls when not provided
 	AutoGenerateShortURLLength = 6
-	ParamShortURL              = "short_url"
-	ParamLongURL               = "long_url"
-	ParamOverride              = "override"
+	// ParamShortURL HTTP POST parameter for short_url
+	ParamShortURL = "short_url"
+	// ParamLongURL HTTP POST parameter for long_url
+	ParamLongURL = "long_url"
+	// ParamOverride HTTP POST parameter for override
+	ParamOverride = "override"
 )
 
 var appFs afero.Fs
@@ -48,8 +52,9 @@ func init() {
 	http.HandleFunc(RedirectPrefix+"/", Redirect)
 }
 
-// Redirect is the main method which takes care of redirecting
 // TODO Check Auth
+
+// Redirect calls the service interface based on either GET or POST
 func Redirect(w http.ResponseWriter, r *http.Request) {
 	// TODO - look at StripPrefix handler
 	shortURL := stripPrefix(r.URL.Path)

@@ -23,7 +23,6 @@ func TestMain(m *testing.M) {
 	fsSettings("memory")
 	// TODO - see how "readFS" can be setup in the same test suite
 	// defer cleanup()
-	// TODO setup config
 
 	os.Exit(m.Run())
 }

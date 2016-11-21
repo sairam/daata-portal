@@ -31,7 +31,49 @@ func TestCreateOrUpdateWithoutShortURL(t *testing.T) {
 
 func TestValidate(t *testing.T) {
 	url := &urlShortner{
-		longURL: "https://www.daata.xyz",
+		shortURL: "yello",
+		longURL:  "https://www.daata.xyz",
+	}
+	errs := url.Validate()
+	if len(errs) > 0 {
+		t.Errorf("Error Validating entity, %s", errs)
+	}
+}
+
+func TestValidateShortURL(t *testing.T) {
+	url := &urlShortner{
+		shortURL: ":)",
+		longURL:  "https://www.daata.xyz",
+	}
+	errs := url.Validate()
+	if len(errs) == 0 {
+		t.Errorf("Error Validating entity, %s", errs)
+	}
+}
+
+func TestValidateBlank(t *testing.T) {
+	url := &urlShortner{
+		longURL: "",
+	}
+	errs := url.Validate()
+	if len(errs) == 0 {
+		t.Errorf("Error Validating entity, %s", errs)
+	}
+}
+
+func TestValidateInvalidProto(t *testing.T) {
+	url := &urlShortner{
+		longURL: "s3://test/hello",
+	}
+	errs := url.Validate()
+	if len(errs) != 1 {
+		t.Errorf("Error Validating entity, %s", errs)
+	}
+}
+
+func TestValidateRelative(t *testing.T) {
+	url := &urlShortner{
+		longURL: "/hello",
 	}
 	errs := url.Validate()
 	if len(errs) > 0 {
