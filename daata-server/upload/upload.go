@@ -11,8 +11,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 
 	conf "../config"
 	"../display"
@@ -23,15 +21,15 @@ import (
 
 // "/" is being used at many locations for many operations. A Path separator makes sense since we have a file separator
 // We need this if we want to run the server on cross platform later on.
-const httpPathSeparator = "/"
+const (
+	// UploadPrefix is prefix.
+	// NOTE - this will be gone once POST is introduced at /
+	UploadPrefix = "/u"
+
+	httpPathSeparator = "/"
+)
 
 type uploadType int
-
-// Info ..
-var Info = make(map[string]time.Time)
-
-// Locker ..
-var Locker = &sync.Mutex{}
 
 const (
 	undetermined uploadType = iota
@@ -42,16 +40,49 @@ const (
 	parallel                // per file
 )
 
-// HeaderVersion is ..
 const (
-	HeaderVersion     = "X-Version" // HeaderVersion is used for creating documentation
-	HeaderAlias       = "X-Alias"   // HeaderAlias used along side documentation for linking a version
-	HeaderUploadType  = "X-Upload-Type"
-	HeaderFileName    = "X-File-Name"
-	HeaderAppend      = "X-Append" // used for Parallel/Concurrent writes
+	// HeaderVersion is used for creating documentation
+	HeaderVersion = "X-Version"
+
+	// HeaderAlias used along side documentation for linking a version
+	HeaderAlias = "X-Alias"
+
+	// HeaderUploadType is the type hinting the uploadType
+	HeaderUploadType = "X-Upload-Type"
+
+	// HeaderFileName is the filename to set
+	HeaderFileName = "X-File-Name"
+
+	// HeaderAppend used for Concurrent writes
+	HeaderAppend = "X-Append"
+
+	// HeaderContentType is the Content-Type
 	HeaderContentType = "Content-Type"
+
+	// ResponseHeaderURL is response header for sending the generated url
 	ResponseHeaderURL = "X-Generated-URL"
 )
+
+type extFrom int
+
+const (
+	extURLPath extFrom = iota
+	extContentType
+)
+
+var whitelistRegExp = regexp.MustCompile(`(tar\.gz|tar\.bz2|gz|zip|bz2|txt|html|json|log|png|jpe?g|bmp|svg|webp|md|markdown|toml|cfg|xml|xls)$`)
+
+type upload struct{}
+
+func init() {
+	u := &upload{}
+	http.HandleFunc(Prefix(), u.delegate)
+}
+
+// Prefix is the location at which the user can upload the files
+func Prefix() string {
+	return UploadPrefix + httpPathSeparator
+}
 
 /*
   1. Get the path to upload the directory to
@@ -159,10 +190,10 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 		CompressionType: compressionType,
 		ArchiveType:     archiveType,
 	}
-
 	settings.AppendMode = isAppend(r.Header, settings)
 
 	if settings.AppendMode {
+		// This is a blocking call
 		err = getLock(uploadLoc.path())
 		if err != nil {
 			w.WriteHeader(http.StatusGatewayTimeout)
@@ -180,7 +211,6 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// _ = settings
-	// output := "hello"
 	action.Perform(settings, uploadLoc.dirpath(), uploadLoc.filepath())
 
 	// Aliases are to be made after the action is done.
@@ -198,34 +228,6 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 	_ = function //(w, r)
 }
 
-func getLock(path string) error {
-	i := 0
-	for _, ok := Info[path]; ok; i++ {
-		time.Sleep(5 * time.Millisecond)
-		// wait for 10 times and timeout if lock is not released
-		if i > 30 {
-			break
-		}
-	}
-	if i > 31 {
-		return errors.New("Unable to unlock")
-		// timeout with 504 and time taken to process the request
-		// and the value of the path
-	}
-	Locker.Lock()
-	// time.Sleep(500 * time.Millisecond) // test with this in case of doubt
-	Info[path] = time.Now()
-	Locker.Unlock()
-	return nil
-
-}
-func releaseLock(path string) error {
-	Locker.Lock()
-	delete(Info, path)
-	Locker.Unlock()
-	return nil
-}
-
 // Extract filename from header
 func getFilename(r *http.Request, ext string, extfrom extFrom) (string, string) {
 	var filename string
@@ -233,7 +235,7 @@ func getFilename(r *http.Request, ext string, extfrom extFrom) (string, string) 
 	// TODO - take care of extension as well or pass a separate header for it
 	filename = r.Header.Get(HeaderFileName)
 	if filename != "" {
-		ext1 := isWhiteListedRegexp(filename)
+		ext1 := isWhiteListedExtension(filename)
 		if ext1 != "" {
 			ext = ext1
 			filename = strings.Replace(filename, "."+ext, "", 1)
@@ -256,16 +258,8 @@ func getFilename(r *http.Request, ext string, extfrom extFrom) (string, string) 
 	return filename, ext
 }
 
-type extFrom int
-
-const (
-	extURLPath extFrom = iota
-	extContentType
-)
-
-func isWhiteListedRegexp(str string) string {
-	var extRegexp = regexp.MustCompile(`(tar\.gz|tar\.bz2|gz|zip|bz2|txt|html|json|log|png|jpe?g|bmp|svg|webp|md|markdown|toml|cfg|xml|xls)$`)
-	var match = extRegexp.FindStringSubmatch(str)
+func isWhiteListedExtension(str string) string {
+	var match = whitelistRegExp.FindStringSubmatch(str)
 	if len(match) > 0 {
 		return match[0]
 	}
@@ -275,7 +269,7 @@ func isWhiteListedRegexp(str string) string {
 func getExt(r *http.Request) (string, extFrom) {
 	d := strings.Split(r.URL.Path, httpPathSeparator)
 	lastPath := d[len(d)-1]
-	match := isWhiteListedRegexp(lastPath)
+	match := isWhiteListedExtension(lastPath)
 	if match != "" {
 		return match, extURLPath
 	}
@@ -372,6 +366,7 @@ func isAppend(header http.Header, settings *action.Settings) bool {
 	return false
 }
 
+// helper method
 // TODO - change name to getDirectory from Path and add below changes
 // Add documentation/Example about working
 // its mandatory to have a / at the end
@@ -397,7 +392,7 @@ func getFromPath(path string) (string, bool) {
 	return strings.Join(data, httpPathSeparator), (len(data) >= 2)
 }
 
-// cleanStrings skips array elements which are blank/nil
+// helper method cleanStrings skips array elements which are blank/nil
 func cleanStrings(data []string, selector string) []string {
 	var r []string
 	for _, str := range data {
@@ -408,23 +403,9 @@ func cleanStrings(data []string, selector string) []string {
 	return r
 }
 
+// helper method
 func getAction(ext string) (ff.CompressionFormat, ff.ArchiveFormat) {
 	ext, compression := ff.FindCompressionFormat(ext)
 	_, archive := ff.FindArchiveFormat(ext)
 	return compression, archive
-}
-
-//UploadPrefix is required to get the upload prefix
-const UploadPrefix = "/u"
-
-// Prefix is the location at which the user can upload the files
-func Prefix() string {
-	return UploadPrefix + httpPathSeparator
-}
-
-type upload struct{}
-
-func init() {
-	u := &upload{}
-	http.HandleFunc(Prefix(), u.delegate)
 }
