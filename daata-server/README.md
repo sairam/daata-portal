@@ -33,7 +33,9 @@ Visit https://example.daata.in/r/yelo+ will display a link to https://www.google
 
 Works with utf8 character set
 
-  curl -D - -X POST -H "Content-Type: multipart/form-data" -F "short_url=he😉lo" -F "long_url=https://www.google.com" https://example.daata.in/r/
+```
+curl -D - -X POST -H "Content-Type: multipart/form-data" -F "short_url=he😉lo" -F "long_url=https://www.google.com" https://example.daata.in/r/
+```
 
 Visit "https://example.daata.in/r/he😉lo+"
 
@@ -41,14 +43,17 @@ Visit "https://example.daata.in/r/he😉lo+"
 
 Use `override=true` to overwrite any existing redirect already set.
 
-  curl -D - -X POST -H "Content-Type: multipart/form-data" -F "short_url=yelo" -F "long_url=https://www.google.com" -F "override=true" https://example.daata.in/r/
+```
+curl -D - -X POST -H "Content-Type: multipart/form-data" -F "short_url=yelo" -F "long_url=https://www.google.com" -F "override=true" https://example.daata.in/r/
+```
 
 #### Example 4
 
 Ignore `short_url` to auto generate
 
-  curl -D - -X POST -H "Content-Type: multipart/form-data" -F "long_url=https://www.google.com" https://example.daata.in/r/
-
+```
+curl -D - -X POST -H "Content-Type: multipart/form-data" -F "long_url=https://www.google.com" https://example.daata.in/r/
+```
 
 ## `upload/display`
 
@@ -98,7 +103,9 @@ Send files from multiple hosts to append with each other
 
 **Usecase:** When querying for logs/static data and needs to be passed merged. Can be run on all hosts in parallel
 
+```
 curl -D - -X POST -H "X-Append: true" -H "X-File-Name: index.txt" --data-binary "@index.txt" https://example.daata.in/u/company/logfile/
+```
 
 #### Example 6
 Send output from `MySQL` or `Postgres` to visualize as smart sortable tables
@@ -115,5 +122,3 @@ Also, aggregate all metrics inside a project path to view it as a dashboard on y
 ```
 curl -D - -X POST -H 'Content-Type: application/vnd.datapoint+value' --data "twitter-stream,78,`date +%s`" https://example.daata.in/u/code-coverage/mycode/
 ```
-
-## `display`
