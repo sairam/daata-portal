@@ -9,7 +9,7 @@ import (
 // Interface for persistence of data
 type persistenceInterface interface {
 	exists() bool
-	read()
+	read() error
 	insert() error
 	update() error
 }

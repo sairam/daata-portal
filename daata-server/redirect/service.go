@@ -24,27 +24,30 @@ func (u *urlShortner) CreateOrUpdate() error {
 	if u.shortURL == "" {
 		u.shortURL = utils.RandomString(AutoGenerateShortURLLength)
 	}
+
+	var persistence persistenceInterface = u
+
 	// insert on false
 	// update on true
 
-	if u.exists() {
+	if persistence.exists() {
 		if u.override {
-			return u.update()
+			return persistence.update()
 		}
 		return errors.New("URL already exists. use 'override' flag to replace")
 	}
-	return u.insert()
+	return persistence.insert()
 }
 
 // add caching if required in service layer
 func (u *urlShortner) Find() error {
-	if u.shortURL != "" && u.exists() {
-		return u.read()
+	var persistence persistenceInterface = u
+	if u.shortURL != "" && persistence.exists() {
+		return persistence.read()
 	}
 	return errors.New("no such url exists")
 }
 
-// TODO - check how to make this cleaner
 func (u *urlShortner) Validate() []error {
 	var errs []error
 	var err []error
