@@ -1,10 +1,10 @@
 ## Start Coding HERE in this order and *`write tests`*
 1. <s>Create new (upload) entities to store information</s>
-1. <s>Unzip / Host files at location based on url endpoint and version
-1. <s>Store data points in a file at a time
-1. <s>Make a graph with data points
-1. <s>Append to file based on name (per directory from multiple hosts)
-1. <s>Help Page
+1. <s>Unzip / Host files at location based on url endpoint and version</s>
+1. <s>Store data points in a file at a time</s>
+1. <s>Make a graph with data points</s>
+1. <s>Append to file based on name (per directory from multiple hosts)</s>
+1. <s>Help Page</s>
 1. Save table data from mysql output and display as HTML tables
 1. Create / Edit (`txt`/`md`/`log`) files (<10KB) and save feature from UI
 1. UI features for `grep`, `split`, `prepend`, `append`, `clean` data etc.,
