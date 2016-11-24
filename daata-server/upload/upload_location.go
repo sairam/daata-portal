@@ -25,7 +25,7 @@ func (u *uploadLocation) clean() error {
 // Generate the directory structure
 func (u *uploadLocation) generateDirectory() error {
 	// fmt.Println("created directory at ", u.dirpath())
-	err := os.MkdirAll(u.dirpath(), os.FileMode(conf.C().Permissions.Directory)) // don't know if this will work
+	err := os.MkdirAll(u.dirpath(), os.FileMode(conf.C().Permissions.Directory))
 	return err
 }
 

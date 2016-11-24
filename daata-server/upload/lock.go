@@ -7,14 +7,23 @@ import (
 )
 
 type locky struct {
+	sync.Mutex
 	info map[string]time.Time
-	*sync.Mutex
 }
 
 var (
 	// Locky takes care of locking during parallel uploads
-	Locky = &locky{}
+	Locky = &locky{info: make(map[string]time.Time)}
 )
+
+func lockupByPath(path string, fn func() error) error {
+	err := getLock(path)
+	if err == nil {
+		defer releaseLock(path)
+		return fn()
+	}
+	return nil
+}
 
 func getLock(path string) error {
 	i := 0

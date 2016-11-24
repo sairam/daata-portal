@@ -10,8 +10,8 @@ directory = "/Users/ram/src/mvp/daata-go/data/"
 directory_length = 6
 
 [upload_permissions]
-directory = 700 # convert to octal
-file = 600
+directory = 448 # 0700 - converted from octal into int
+file = 384 # 0600 - converted from octal into int
 
 [directories]
 # directories should end with a /

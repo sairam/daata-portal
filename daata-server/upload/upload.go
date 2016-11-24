@@ -194,13 +194,15 @@ func (u *upload) delegate(w http.ResponseWriter, r *http.Request) {
 
 	if settings.AppendMode {
 		// This is a blocking call
-		err = getLock(uploadLoc.path())
+		err = lockupByPath(uploadLoc.path(), func() error {
+			_, err1 := utils.AppendToFile(uploadLoc.path(), bodyData)
+			return err1
+		})
 		if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusGatewayTimeout)
 			return
 		}
-		_, err = utils.AppendToFile(uploadLoc.path(), bodyData)
-		releaseLock(uploadLoc.path())
 	} else {
 		_, err = utils.SaveToFile(uploadLoc.path(), bodyData)
 	}
